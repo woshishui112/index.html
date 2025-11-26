@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>家庭用药避坑指南 | 救援版 Pro</title>
+    <title>家庭用药避坑指南 | 救援版 Ultimate</title>
     <style>
         /* --- 基础样式 --- */
         :root { --primary: #4f46e5; --danger: #dc2626; --warning: #d97706; --success: #10b981; --bg: #f1f5f9; --text-main: #1e293b; --text-sub: #64748b; }
@@ -42,9 +42,9 @@
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; padding-right: 20px; }
         .drug-name { font-size: 18px; font-weight: 800; color: var(--text-main); margin: 0; line-height: 1.4; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
         
-        /* 简称标签样式优化 */
+        /* 简称标签 */
         .abbr-badge { font-size: 11px; background: #f1f5f9; color: #475569; padding: 3px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: normal; display: inline-flex; align-items: center; }
-        .abbr-badge b { opacity: 0.6; font-weight: normal; margin-right: 4px; font-size: 10px; }
+        .abbr-badge b { opacity: 0.7; font-weight: bold; margin-right: 4px; font-size: 10px; color: #334155; }
 
         .risk-badge { font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; margin-top: 8px; display: inline-block; }
         .risk-red { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
@@ -70,7 +70,6 @@
         
         .label { font-weight: 800; display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; opacity: 0.7; letter-spacing: 0.5px; }
 
-        /* 底部版权 */
         footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 30px; }
 
         /* 模拟扫描遮罩 */
@@ -91,7 +90,7 @@
             </div>
             <div>
                 <div style="font-weight:800; font-size:18px; letter-spacing:-0.5px;">家庭用药避坑指南</div>
-                <div style="font-size:11px; opacity:0.8; font-weight:500;">救援版 Pro · 诊所避坑 · 一键查</div>
+                <div style="font-size:11px; opacity:0.8; font-weight:500;">救援版 Ultimate · 49种高危药库</div>
             </div>
         </div>
     </header>
@@ -133,10 +132,9 @@
     </div>
 
     <script>
-        // --- 核心数据库 (已扩充至 40+ 条) ---
-        // 新增 ID 30-39 为诊所常见坑人药
+        // --- 核心数据库 (共 49 条) ---
         const drugDatabase = [
-            // === 原有核心数据 ===
+            // === 1-29 基础高危药 ===
             { id: 1, name: "安乃近", abbr: "Analgin", aliases: ["大药片", "退烧针", "诺瓦金"], category: "退烧止痛", riskLevel: "❌ 国家注销 (极高危)", riskColor: "risk-red", harm: "【致死】粒细胞缺乏症（免疫瘫痪）；严重过敏性休克。", consequence: "国家药监局公告：停止生产，注销批文。", alternatives: "布洛芬、对乙酰氨基酚" },
             { id: 2, name: "尼美舒利", abbr: "Nimesulide", aliases: ["瑞芝清", "退烧颗粒"], category: "退烧止痛", riskLevel: "❌ 12岁以下禁用", riskColor: "risk-red", harm: "【肝衰竭】严重肝毒性，致死率高。", consequence: "国家食药监局通知：禁止用于12岁以下。", alternatives: "布洛芬、对乙酰氨基酚" },
             { id: 3, name: "阿司匹林", abbr: "Aspirin", aliases: ["巴米尔", "ASA"], category: "退烧止痛", riskLevel: "❌ 16岁以下发烧禁用", riskColor: "risk-red", harm: "【瑞氏综合征】致死性脑病+肝损，死亡率30%。", consequence: "儿童病毒感染发烧禁用。", alternatives: "布洛芬" },
@@ -147,37 +145,49 @@
             { id: 8, name: "诺氟沙星", abbr: "Norfloxacin", aliases: ["氟哌酸", "沙星"], category: "抗生素", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【骨骼损伤】影响软骨发育，长不高，肌腱断裂。", consequence: "说明书禁忌：18岁以下禁用。", alternatives: "蒙脱石散" },
             { id: 9, name: "左氧氟沙星", abbr: "LVFX", aliases: ["Levofloxacin", "沙星类"], category: "抗生素", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【骨骼损伤】影响软骨发育，长不高。", consequence: "说明书禁忌。", alternatives: "头孢类" },
             { id: 10, name: "四环素", abbr: "TCY", aliases: ["土霉素", "OTC", "强力霉素"], category: "抗生素", riskLevel: "❌ 8岁禁用", riskColor: "risk-red", harm: "【四环素牙】牙齿永久变黑、发育不良。", consequence: "毁容性副作用。", alternatives: "阿奇霉素" },
-            { id: 11, name: "可待因", abbr: "Codeine", aliases: ["罂粟壳", "强力枇杷露", "复方甘草片(旧)", "克咳"], category: "止咳化痰", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【成瘾/窒息】含毒品成分，抑制呼吸。", consequence: "国家药监局公告：18岁以下禁用。", alternatives: "右美沙芬" },
+            { id: 11, name: "可待因", abbr: "Codeine", aliases: ["罂粟壳", "强力枇杷露", "复方甘草片(旧)", "克咳"], category: "止咳/止吐", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【成瘾/窒息】含毒品成分，抑制呼吸。", consequence: "国家药监局公告：18岁以下禁用。", alternatives: "右美沙芬" },
             { id: 12, name: "异丙嗪", abbr: "PMZ", aliases: ["非那根", "Promethazine", "伤风止咳"], category: "止咳/止吐", riskLevel: "❌ 2岁禁用", riskColor: "risk-red", harm: "【呼吸抑制】可能导致幼儿呼吸停止死亡！", consequence: "WHO警示：绝对禁用于2岁以下。", alternatives: "海盐水" },
-            { id: 13, name: "萘甲唑啉", abbr: "Naphazoline", aliases: ["滴鼻净", "滴鼻水"], category: "感冒鼻炎", riskLevel: "❌ 儿童禁用", riskColor: "risk-red", harm: "【中毒】易导致儿童休克、昏迷。", consequence: "临床用药须知警示。", alternatives: "海盐水" },
-            { id: 14, name: "艾畅(老版)", abbr: "Pseudoephedrine", aliases: ["伪麻美芬", "艾畅"], category: "感冒药", riskLevel: "❌ 国家注销", riskColor: "risk-red", harm: "含伪麻黄碱，婴幼儿风险高。", consequence: "国家药监局注销批文。", alternatives: "海盐水" },
+            { id: 13, name: "萘甲唑啉", abbr: "Naphazoline", aliases: ["滴鼻净", "滴鼻水"], category: "其他", riskLevel: "❌ 儿童禁用", riskColor: "risk-red", harm: "【中毒】易导致儿童休克、昏迷。", consequence: "临床用药须知警示。", alternatives: "海盐水" },
+            { id: 14, name: "艾畅(老版)", abbr: "Pseudoephedrine", aliases: ["伪麻美芬", "艾畅"], category: "其他", riskLevel: "❌ 国家注销", riskColor: "risk-red", harm: "含伪麻黄碱，婴幼儿风险高。", consequence: "国家药监局注销批文。", alternatives: "海盐水" },
             { id: 15, name: "金刚烷胺", abbr: "Amantadine", aliases: ["优卡丹", "好娃娃", "快克"], category: "抗病毒", riskLevel: "⚠️ 5岁慎用", riskColor: "risk-orange", harm: "肝肾毒性，对流感无效。", consequence: "国家药监局修订说明书。", alternatives: "单一退烧药" },
             { id: 16, name: "柴胡注射液", abbr: "Chaihu", aliases: ["退烧针"], category: "中药注射", riskLevel: "❌ 儿童禁用", riskColor: "risk-red", harm: "【过敏性休克】曾导致多起儿童致死。", consequence: "国家药监局公告。", alternatives: "口服布洛芬" },
             { id: 17, name: "双黄连注射液", abbr: "SHL", aliases: ["双黄连"], category: "中药注射", riskLevel: "❌ 4岁禁用", riskColor: "risk-red", harm: "严重过敏反应，休克。", consequence: "国家药监局公告。", alternatives: "口服中成药" },
             { id: 18, name: "茵栀黄注射液", abbr: "YZH", aliases: ["退黄针"], category: "中药注射", riskLevel: "❌ 新生儿禁用", riskColor: "risk-red", harm: "【死亡风险】曾致新生儿死亡。", consequence: "国家药监局公告。", alternatives: "蓝光照射" },
             { id: 19, name: "喜炎平", abbr: "XYP", aliases: ["喜炎平"], category: "中药注射", riskLevel: "⚠️ 慎用", riskColor: "risk-orange", harm: "全身性过敏反应，呼吸困难。", consequence: "不良反应通报。", alternatives: "口服药" },
             { id: 20, name: "土三七", abbr: "TCM Toxic", aliases: ["菊三七"], category: "中草药", riskLevel: "❌ 剧毒", riskColor: "risk-red", harm: "【肝窦阻塞】导致肝腹水、肝衰竭，无药可治。", consequence: "绝对禁用。", alternatives: "正规三七" },
-            { id: 21, name: "酚酞片", keywords: ["酚酞", "果导片"], category: "泻药", riskLevel: "❌ 国家注销", riskColor: "risk-red", harm: "【致癌】严重致癌风险。", consequence: "国家药监局注销。", alternatives: "乳果糖" },
-            { id: 22, name: "洛哌丁胺", abbr: "Loperamide", aliases: ["易蒙停", "止泻灵"], category: "消化类", riskLevel: "❌ 2岁禁用", riskColor: "risk-red", harm: "【肠坏死】麻痹肠道，导致毒素堆积中毒。", consequence: "2岁以下禁用。", alternatives: "蒙脱石散" },
-            { id: 23, name: "多潘立酮", abbr: "DOM", aliases: ["吗丁啉"], category: "消化类", riskLevel: "⚠️ 12岁慎用", riskColor: "risk-orange", harm: "心脏猝死(QT间期延长)。", consequence: "欧美限制使用。", alternatives: "益生菌" },
-            { id: 24, name: "西布曲明", abbr: "Sibutramine", aliases: ["减肥药"], category: "减肥药", riskLevel: "❌ 全球禁用", riskColor: "risk-red", harm: "增加心脏病和中风风险。", consequence: "已注销。", alternatives: "运动" },
-            { id: 25, name: "地塞米松", abbr: "DXM", aliases: ["激素", "地塞"], category: "激素", riskLevel: "⚠️ 慎用", riskColor: "risk-orange", harm: "滥用退烧掩盖病情，降低免疫力。", consequence: "单纯感冒不应常规使用。", alternatives: "布洛芬" },
+            { id: 21, name: "酚酞片", keywords: ["酚酞", "果导片"], category: "其他", riskLevel: "❌ 国家注销", riskColor: "risk-red", harm: "【致癌】严重致癌风险。", consequence: "国家药监局注销。", alternatives: "乳果糖" },
+            { id: 22, name: "洛哌丁胺", abbr: "Loperamide", aliases: ["易蒙停", "止泻灵"], category: "其他", riskLevel: "❌ 2岁禁用", riskColor: "risk-red", harm: "【肠坏死】麻痹肠道，导致毒素堆积中毒。", consequence: "2岁以下禁用。", alternatives: "蒙脱石散" },
+            { id: 23, name: "多潘立酮", abbr: "DOM", aliases: ["吗丁啉"], category: "其他", riskLevel: "⚠️ 12岁慎用", riskColor: "risk-orange", harm: "心脏猝死(QT间期延长)。", consequence: "欧美限制使用。", alternatives: "益生菌" },
+            { id: 24, name: "西布曲明", abbr: "Sibutramine", aliases: ["减肥药"], category: "其他", riskLevel: "❌ 全球禁用", riskColor: "risk-red", harm: "增加心脏病和中风风险。", consequence: "已注销。", alternatives: "运动" },
+            { id: 25, name: "地塞米松", abbr: "DXM", aliases: ["激素", "地塞"], category: "其他", riskLevel: "⚠️ 慎用", riskColor: "risk-orange", harm: "滥用退烧掩盖病情，降低免疫力。", consequence: "单纯感冒不应常规使用。", alternatives: "布洛芬" },
             { id: 26, name: "利巴韦林", abbr: "RBV", aliases: ["病毒唑", "Ribavirin"], category: "抗病毒", riskLevel: "⚠️ 不推荐", riskColor: "risk-orange", harm: "致畸，溶血性贫血。对普通感冒无效。", consequence: "生殖毒性大。", alternatives: "奥司他韦" },
-            { id: 27, name: "强效激素膏", abbr: "Steroids", aliases: ["氯倍他索", "特美肤"], category: "皮肤外用", riskLevel: "⚠️ 儿童慎用", riskColor: "risk-orange", harm: "皮肤萎缩，激素依赖，抑制生长。", consequence: "应选弱效激素。", alternatives: "尤卓尔" },
+            { id: 27, name: "强效激素膏", abbr: "Steroids", aliases: ["氯倍他索", "特美肤"], category: "其他", riskLevel: "⚠️ 儿童慎用", riskColor: "risk-orange", harm: "皮肤萎缩，激素依赖，抑制生长。", consequence: "应选弱效激素。", alternatives: "尤卓尔" },
             { id: 28, name: "头孢地尼", abbr: "Cefdinir", aliases: ["头孢"], category: "抗生素", riskLevel: "✅ 安全抗生素", riskColor: "risk-green", harm: "对症药物，请遵医嘱服用。", consequence: "三代头孢，针对呼吸道。", alternatives: "无" },
             { id: 29, name: "阿奇霉素", abbr: "Azithromycin", aliases: ["阿奇"], category: "抗生素", riskLevel: "✅ 支原体特效", riskColor: "risk-green", harm: "注意胃肠反应，吃3停4。", consequence: "支原体首选。", alternatives: "无" },
             
-            // === 新增：诊所常用但有害/高危药物 ===
+            // === 30-39 诊所避坑药 ===
             { id: 30, name: "甲氧氯普胺", abbr: "Metoclopramide", aliases: ["胃复安", "止吐针"], category: "止咳/止吐", riskLevel: "❌ 儿童慎用", riskColor: "risk-red", harm: "【锥体外系反应】儿童易发生震颤、僵硬、眼球上翻（鬼脸综合征）。", consequence: "儿童及老年人慎用。", alternatives: "昂丹司琼" },
             { id: 31, name: "林可霉素", abbr: "Lincomycin", aliases: ["洁霉素"], category: "抗生素", riskLevel: "⚠️ 淘汰趋势", riskColor: "risk-orange", harm: "【伪膜性肠炎】严重腹泻，过敏反应多。效果不如新药。", consequence: "老一代抗生素，副作用大。", alternatives: "克林霉素" },
             { id: 32, name: "炎琥宁/穿琥宁", abbr: "Andrographolide", aliases: ["抗病毒针"], category: "中药注射", riskLevel: "⚠️ 高危过敏", riskColor: "risk-orange", harm: "【过敏性休克】发生率极高，特别是儿童。", consequence: "国家药监局多次通报。", alternatives: "无特效药，自愈为主" },
-            { id: 33, name: "红药水/紫药水", abbr: "Mercury/Violet", aliases: ["红汞", "龙胆紫"], category: "皮肤外用", riskLevel: "❌ 淘汰", riskColor: "risk-red", harm: "红药水含汞（水银中毒）；紫药水致癌。", consequence: "已被碘伏完全取代。", alternatives: "碘伏" },
-            { id: 34, name: "复方甘草片", abbr: "Licorice", aliases: ["甘草片"], category: "止咳化痰", riskLevel: "❌ 易成瘾", riskColor: "risk-red", harm: "【阿片成瘾】含阿片粉（鸦片），长期吃会成瘾。", consequence: "严格管制药物。", alternatives: "右美沙芬、乙酰半胱氨酸" },
+            { id: 33, name: "红药水/紫药水", abbr: "Mercury/Violet", aliases: ["红汞", "龙胆紫"], category: "其他", riskLevel: "❌ 淘汰", riskColor: "risk-red", harm: "红药水含汞（水银中毒）；紫药水致癌。", consequence: "已被碘伏完全取代。", alternatives: "碘伏" },
+            { id: 34, name: "复方甘草片", abbr: "Licorice", aliases: ["甘草片"], category: "止咳/止吐", riskLevel: "❌ 易成瘾", riskColor: "risk-red", harm: "【阿片成瘾】含阿片粉（鸦片），长期吃会成瘾。", consequence: "严格管制药物。", alternatives: "右美沙芬" },
             { id: 35, name: "牛黄解毒片", abbr: "Realgar", aliases: ["解毒片"], category: "中草药", riskLevel: "⚠️ 砷中毒", riskColor: "risk-orange", harm: "含雄黄（砷/砒霜成分），长期服用伤肝肾。", consequence: "不宜长期服用。", alternatives: "多喝水" },
             { id: 36, name: "藿香正气水", abbr: "Alcohol Mix", aliases: ["正气水"], category: "中草药", riskLevel: "⚠️ 酒精反应", riskColor: "risk-orange", harm: "【双硫仑反应】含酒精！若与头孢类同吃，可能致死。", consequence: "不可与头孢同服。", alternatives: "藿香正气液(无醇)" },
             { id: 37, name: "阿苯片", abbr: "Compound APC", aliases: ["止痛片"], category: "退烧止痛", riskLevel: "❌ 禁用", riskColor: "risk-red", harm: "含氨基比林+苯巴比妥，双重毒性。", consequence: "已被淘汰。", alternatives: "布洛芬" },
             { id: 38, name: "头孢曲松+钙", abbr: "Interaction", aliases: ["输液反应"], category: "抗生素", riskLevel: "❌ 致死禁忌", riskColor: "risk-red", harm: "【结晶致死】头孢曲松与含钙液（葡萄糖酸钙）混合产生沉淀，致死。", consequence: "严禁混合输注。", alternatives: "分开使用" },
-            { id: 39, name: "卡马西平", abbr: "CBZ", aliases: ["得理多"], category: "神经类", riskLevel: "⚠️ 基因风险", riskColor: "risk-orange", harm: "【剥脱性皮炎】汉族人易发生严重皮肤坏死（SJS），需测基因。", consequence: "使用前建议基因检测。", alternatives: "加巴喷丁" }
+            { id: 39, name: "卡马西平", abbr: "CBZ", aliases: ["得理多"], category: "其他", riskLevel: "⚠️ 基因风险", riskColor: "risk-orange", harm: "【剥脱性皮炎】汉族人易发生严重皮肤坏死（SJS），需测基因。", consequence: "使用前建议基因检测。", alternatives: "加巴喷丁" },
+
+            // === 40-49 新增：隐蔽风险与儿童安全 ===
+            { id: 40, name: "孟鲁司特钠", abbr: "Montelukast", aliases: ["顺尔宁", "孟鲁"], category: "止咳/止吐", riskLevel: "⚠️ 黑框警告", riskColor: "risk-orange", harm: "【精神副作用】FDA黑框警告：可能导致儿童噩梦、攻击性、抑郁甚至自杀倾向。", consequence: "家长需密切观察孩子情绪变化。", alternatives: "氯雷他定/西替利嗪" },
+            { id: 41, name: "氯霉素", abbr: "Chloramphenicol", aliases: ["眼药水"], category: "抗生素", riskLevel: "❌ 严重骨髓毒性", riskColor: "risk-red", harm: "【灰婴综合征】骨髓抑制，导致再生障碍性贫血（白血病前兆）。", consequence: "现已极少使用，儿童禁用。", alternatives: "红霉素眼膏" },
+            { id: 42, name: "小儿氨酚黄那敏", abbr: "Pediatric Mix", aliases: ["护彤", "小快克", "优卡丹"], category: "其他", riskLevel: "⚠️ 易过量中毒", riskColor: "risk-orange", harm: "【肝损伤】含对乙酰氨基酚。若再吃退烧药，会双倍过量致肝衰竭。", consequence: "不建议用于6岁以下普通感冒。", alternatives: "单一成分退烧药" },
+            { id: 43, name: "赛洛唑啉/氧甲唑啉", abbr: "Xylometazoline", aliases: ["鼻炎水", "通鼻喷雾"], category: "其他", riskLevel: "⚠️ 成瘾", riskColor: "risk-orange", harm: "【药物性鼻炎】连续使用超过7天会导致鼻腔反跳性充血，越喷越堵。", consequence: "严格限制使用天数。", alternatives: "海盐水洗鼻" },
+            { id: 44, name: "西咪替丁", abbr: "Cimetidine", aliases: ["甲氰咪胍", "胃药"], category: "其他", riskLevel: "⚠️ 激素副作用", riskColor: "risk-orange", harm: "【抗雄激素】透过血脑屏障。可能导致小男孩乳房发育，老年人神志不清。", consequence: "已被法莫替丁等替代。", alternatives: "法莫替丁/奥美拉唑" },
+            { id: 45, name: "匹多莫德", abbr: "Pidotimod", aliases: ["增强免疫力"], category: "其他", riskLevel: "⚠️ 3岁以下禁用", riskColor: "risk-orange", harm: "【效果不明】临床疗效证据不足，却被滥用于儿童感冒。", consequence: "国家药监局：3岁以下禁用。", alternatives: "均衡饮食" },
+            { id: 46, name: "维C泡腾片", abbr: "Vitamin C", aliases: ["泡腾片"], category: "其他", riskLevel: "❌ 禁直接吞服", riskColor: "risk-red", harm: "【窒息致死】儿童直接吞服会产生大量气体导致窒息死亡！且钠含量极高。", consequence: "必须溶解后饮用。", alternatives: "普通维C片" },
+            { id: 47, name: "硝苯地平(短效)", abbr: "Nifedipine", aliases: ["心痛定", "急救药"], category: "其他", riskLevel: "❌ 禁舌下含服", riskColor: "risk-red", harm: "【中风风险】舌下含服降压过快，会导致脑供血不足引起中风。", consequence: "高血压急症禁忌。", alternatives: "缓释片(遵医嘱)" },
+            { id: 48, name: "甲硝唑", abbr: "Metronidazole", aliases: ["灭滴灵", "牙痛药"], category: "抗生素", riskLevel: "❌ 禁酒/孕早禁", riskColor: "risk-red", harm: "【双硫仑反应】服药期间饮酒可致死；怀孕前3个月禁用（致畸风险）。", consequence: "服药前后一周禁酒。", alternatives: "（牙痛需就医）" },
+            { id: 49, name: "开封过的眼药水", abbr: "Opened Drops", aliases: ["眼药水"], category: "其他", riskLevel: "❌ 4周后丢弃", riskColor: "risk-red", harm: "【细菌感染】眼药水开封4周后防腐剂失效，变成细菌培养皿，滴入引发角膜炎。", consequence: "瓶身有效期仅指未开封。", alternatives: "一次性独立包装" }
         ];
 
         // --- 逻辑代码 ---
@@ -186,10 +196,10 @@
         
         function init() {
             // 生成标签
-            const categories = ["全部", "退烧止痛", "抗生素", "止咳/止吐", "中药注射", "中草药", "皮肤/其他"];
+            const categories = ["全部", "退烧止痛", "抗生素", "止咳/止吐", "中药注射", "中草药", "抗病毒", "其他"];
             const tagContainer = document.getElementById('categoryTags');
             
-            // 收藏夹标签 (特殊处理)
+            // 收藏夹标签
             const favBtn = document.createElement('div');
             favBtn.className = 'tag';
             favBtn.innerHTML = `⚠️ 我的警示单 <span id="favCount">(${favorites.length})</span>`;
@@ -198,7 +208,7 @@
             };
             tagContainer.appendChild(favBtn);
 
-            categories.forEach((cat, index) => {
+            categories.forEach((cat) => {
                 const btn = document.createElement('div');
                 btn.className = `tag ${cat === '全部' ? 'active' : ''}`;
                 btn.innerText = cat;
@@ -225,7 +235,7 @@
         }
 
         function toggleFav(e, id) {
-            e.stopPropagation(); // 防止触发卡片展开
+            e.stopPropagation();
             const index = favorites.indexOf(id);
             if (index === -1) {
                 favorites.push(id);
@@ -235,11 +245,9 @@
             localStorage.setItem('myDrugFavs', JSON.stringify(favorites));
             document.getElementById('favCount').innerText = `(${favorites.length})`;
             
-            // 重新渲染当前按钮状态
             const btn = e.target.closest('.fav-btn');
             btn.classList.toggle('active');
 
-            // 如果当前在收藏页，需要刷新列表
             if (currentCategory === 'favorites') {
                 renderList();
             }
@@ -253,7 +261,7 @@
             const filtered = drugDatabase.filter(drug => {
                 const matchSearch = drug.name.toLowerCase().includes(searchTerm) || 
                                     (drug.abbr && drug.abbr.toLowerCase().includes(searchTerm)) ||
-                                    drug.aliases.some(a => a.toLowerCase().includes(searchTerm));
+                                    (drug.aliases && drug.aliases.some(a => a.toLowerCase().includes(searchTerm)));
                 
                 if (currentCategory === 'favorites') {
                     return favorites.includes(drug.id) && matchSearch;
@@ -280,13 +288,11 @@
                 const div = document.createElement('div');
                 div.className = `card`;
                 div.onclick = (e) => {
-                    // 防止点击收藏按钮时展开
                     if(!e.target.closest('.fav-btn')) {
                         div.classList.toggle('open');
                     }
                 };
                 
-                // 简称显示的逻辑优化：如果有简称，显示 "简称: XXX"，否则不显示
                 const abbrHtml = drug.abbr ? `<span class="abbr-badge"><b>简称</b>${drug.abbr}</span>` : '';
 
                 div.innerHTML = `
@@ -300,7 +306,7 @@
                                 ${abbrHtml}
                             </h3>
                             <span class="risk-badge ${drug.riskColor}">${drug.riskLevel}</span>
-                            <div class="alias">别名/关键词: ${drug.aliases.join(' / ')}</div>
+                            <div class="alias">别名/关键词: ${drug.aliases ? drug.aliases.join(' / ') : '-'}</div>
                         </div>
                     </div>
                     <div class="chevron">
@@ -331,30 +337,28 @@
             const overlay = document.getElementById('scan-overlay');
             overlay.style.display = 'flex';
             
-            // 2.5秒后模拟出结果
             setTimeout(() => {
                 overlay.style.display = 'none';
                 // 随机挑选一个高危药展示 (倾向于新加的药)
-                const randomPool = [1, 2, 30, 31, 32, 34, 36]; 
+                const randomPool = [1, 2, 40, 42, 43, 46, 49]; 
                 const randomId = randomPool[Math.floor(Math.random() * randomPool.length)];
                 const drug = drugDatabase.find(d => d.id === randomId);
                 
                 document.getElementById('searchInput').value = drug.name;
                 currentCategory = "全部";
                 document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tag')[1].classList.add('active'); 
                 
                 renderList();
                 
-                // 自动展开
                 setTimeout(() => {
                     const firstCard = document.querySelector('.card');
                     if(firstCard) firstCard.classList.add('open');
                     alert(`🚨 [AI演示模式] \n\n识别结果：${drug.name}\n检测到高风险！请查看详情。`);
                 }, 100);
-            }, 2500);
+            }, 2000);
         }
 
-        // 初始化
         init();
     </script>
 </body>
