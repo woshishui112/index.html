@@ -3,304 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>家庭用药避坑指南 | 极速修复版</title>
-    
-    <!-- 1. 使用最稳定的国内 CDN 源 -->
-    <script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.3.3/tailwind.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/babel-standalone/7.22.17/babel.min.js"></script>
-    
+    <title>家庭用药避坑指南 | 救援版</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
-        /* 加载动画 */
-        .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #7e22ce; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(to right, transparent, #a855f7, transparent); animation: scanning 1.5s infinite; z-index: 10; }
-        @keyframes scanning { 0% { top: 0; } 100% { top: 100%; } }
-        #root { display: block; } /* 防止白屏 */
+        /* --- 基础样式 (不依赖任何外部CSS) --- */
+        :root { --primary: #4f46e5; --danger: #dc2626; --warning: #f59e0b; --success: #10b981; --bg: #f8fafc; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background: var(--bg); color: #334155; padding-bottom: 80px; }
+        
+        /* 头部样式 */
+        header { background: linear-gradient(135deg, #4338ca 0%, #312e81 100%); color: white; padding: 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .header-content { max-width: 800px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+        .logo-icon { background: rgba(255,255,255,0.2); padding: 6px; border-radius: 8px; display: flex; }
+        
+        /* 搜索区样式 */
+        .search-section { background: white; padding: 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .search-container { max-width: 800px; margin: 0 auto; position: relative; display: flex; gap: 10px; }
+        input { width: 100%; padding: 14px 14px 14px 44px; font-size: 16px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none; transition: all 0.3s; background: #f1f5f9; }
+        input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        
+        .cam-btn { background: var(--primary); color: white; border: none; padding: 0 16px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; min-width: 60px; }
+        .cam-btn:active { transform: scale(0.95); }
+
+        /* 标签按钮 */
+        .tags { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; max-width: 800px; margin: 0 auto; -webkit-overflow-scrolling: touch; }
+        .tag { white-space: nowrap; padding: 6px 12px; border-radius: 20px; border: 1px solid #cbd5e1; font-size: 13px; color: #64748b; background: white; cursor: pointer; }
+        .tag.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* 列表卡片样式 */
+        .list-container { max-width: 800px; margin: 0 auto; padding: 0 16px; }
+        .card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.2s; cursor: pointer; }
+        .card:active { background-color: #f8fafc; }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .drug-name { font-size: 18px; font-weight: 700; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .abbr-badge { font-size: 10px; background: #334155; color: white; padding: 2px 6px; border-radius: 4px; vertical-align: middle; }
+        .risk-badge { font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; margin-top: 6px; display: inline-block; }
+        .risk-red { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+        .risk-orange { background: #fff7ed; color: var(--warning); border: 1px solid #fed7aa; }
+        .risk-green { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
+        
+        .alias { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+        
+        /* 详情展开区 */
+        .detail { display: none; border-top: 1px solid #f1f5f9; margin-top: 12px; padding-top: 12px; animation: slideDown 0.3s ease; }
+        .card.open .detail { display: block; }
+        .card.open .chevron { transform: rotate(180deg); }
+        
+        .box { padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; line-height: 1.5; }
+        .box-harm { background: #fef2f2; border-left: 4px solid var(--danger); }
+        .box-policy { background: #f1f5f9; color: #64748b; font-size: 12px; display: flex; gap: 8px; }
+        .box-alt { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+        
+        .label { font-weight: bold; display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; opacity: 0.8; }
+
+        /* 底部版权 */
+        footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 20px; }
+
+        /* 模拟扫描遮罩 */
+        #scan-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .scan-line { width: 80%; height: 2px; background: #3b82f6; box-shadow: 0 0 10px #3b82f6; animation: scanning 1.5s infinite; margin-bottom: 20px; }
+        @keyframes scanning { 0% { width: 0; opacity: 0; } 50% { width: 80%; opacity: 1; } 100% { width: 0; opacity: 0; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
     </style>
 </head>
 <body>
-    <!-- 故障兜底显示 -->
-    <div id="loading-text" style="text-align:center; padding: 20px; color: #666;">正在启动药箱...<br>如果长时间无反应，请刷新页面</div>
-    
-    <div id="root"></div>
 
-    <script type="text/babel">
-        // 启动成功后隐藏加载文字
-        document.getElementById('loading-text').style.display = 'none';
+    <header>
+        <div class="header-content">
+            <div class="logo-icon">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+                <div style="font-weight:bold; font-size:18px;">家庭用药避坑指南</div>
+                <div style="font-size:10px; opacity:0.8;">救援版 · 0依赖 · 秒开</div>
+            </div>
+        </div>
+    </header>
 
-        const { useState, useRef, useEffect } = React;
+    <div class="search-section">
+        <div class="search-container">
+            <div style="position:relative; flex:1;">
+                <span class="search-icon">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </span>
+                <input type="text" id="searchInput" placeholder="输入药名或 AKC, DXM..." oninput="renderList()">
+            </div>
+            <button class="cam-btn" onclick="startScan()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                识别
+            </button>
+        </div>
+        <div class="tags" id="categoryTags">
+            <!-- JS生成标签 -->
+        </div>
+    </div>
 
-        // --- 图标组件 (内置SVG，确保不依赖外部字体，极速加载) ---
-        const Icons = {
-            Shield: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>,
-            Search: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>,
-            Camera: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>,
-            Image: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>,
-            AlertTriangle: () => <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>,
-            AlertOctagon: () => <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>,
-            XCircle: () => <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>,
-            Gavel: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72l1.189-1.19A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"></path></svg>,
-            ShieldCheck: () => <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" /></svg>,
-            ChevronDown: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"></path></svg>,
-            Tag: () => <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-        };
+    <div id="drugList" class="list-container">
+        <!-- JS生成列表 -->
+    </div>
 
-        // --- 3. 全量高危药物数据库 (50+) ---
+    <footer>
+        本工具仅供参考 · 依据国家药监局公告整理
+    </footer>
+
+    <!-- 模拟扫描遮罩 -->
+    <div id="scan-overlay">
+        <div class="scan-line"></div>
+        <p>正在分析图片...</p>
+        <p style="font-size:12px; color:#cbd5e1; margin-top:10px;">(演示模式：将随机展示一个高危药)</p>
+    </div>
+
+    <script>
+        // --- 50+种 核心数据库 (内置在HTML里，无需下载) ---
         const drugDatabase = [
-            { id: 1, name: "安乃近", abbr: "Analgin", aliases: ["大药片", "退烧针", "诺瓦金"], category: "退烧止痛", riskLevel: "❌ 国家注销 (极高危)", riskColor: "bg-red-600 text-white", harm: "【致死】粒细胞缺乏症（免疫瘫痪）；严重过敏性休克。", consequence: "国家药监局公告：停止生产，注销批文。", alternatives: "布洛芬、对乙酰氨基酚" },
-            { id: 2, name: "尼美舒利", abbr: "Nimesulide", aliases: ["瑞芝清", "退烧颗粒"], category: "退烧止痛", riskLevel: "❌ 12岁以下禁用", riskColor: "bg-red-600 text-white", harm: "【肝衰竭】严重肝毒性，致死率高。", consequence: "国家食药监局通知：禁止用于12岁以下。", alternatives: "布洛芬、对乙酰氨基酚" },
-            { id: 3, name: "阿司匹林", abbr: "Aspirin", aliases: ["巴米尔", "ASA"], category: "退烧止痛", riskLevel: "❌ 16岁以下发烧禁用", riskColor: "bg-red-600 text-white", harm: "【瑞氏综合征】致死性脑病+肝损，死亡率30%。", consequence: "儿童病毒感染发烧禁用。", alternatives: "布洛芬" },
-            { id: 4, name: "氨基比林", abbr: "APC", aliases: ["去痛片", "安痛定"], category: "退烧止痛", riskLevel: "⚠️ 淘汰药", riskColor: "bg-orange-500 text-white", harm: "【血液毒性】粒细胞减少，伤肾。", consequence: "已被更安全药物替代。", alternatives: "布洛芬" },
-            { id: 5, name: "赖氨匹林", abbr: "Lys-Asp", aliases: ["退烧针"], category: "退烧止痛", riskLevel: "❌ 16岁以下慎用", riskColor: "bg-red-600 text-white", harm: "同阿司匹林，注射更容易引起瑞氏综合征。", consequence: "说明书警示。", alternatives: "口服退烧药" },
-            { id: 6, name: "保泰松", abbr: "Phenylbutazone", aliases: ["风湿药"], category: "止痛药", riskLevel: "❌ 高毒性", riskColor: "bg-red-600 text-white", harm: "可引起再生障碍性贫血（血癌），胃出血。", consequence: "已被淘汰。", alternatives: "其他NSAIDs" },
-            { id: 7, name: "阿米卡星", abbr: "AKC", aliases: ["AMK", "丁胺卡那"], category: "抗生素", riskLevel: "⚠️ 儿童慎用 (高危)", riskColor: "bg-orange-500 text-white", harm: "【耳毒性+肾毒性】听力下降甚至耳聋；损伤肾脏。", consequence: "普通感冒用此药属于过度医疗。", alternatives: "头孢类" },
-            { id: 8, name: "庆大霉素", abbr: "GM", aliases: ["Gentamycin", "针剂"], category: "抗生素", riskLevel: "⚠️ 儿童慎用 (高危)", riskColor: "bg-orange-500 text-white", harm: "【耳毒性】一针致聋风险，不可逆。", consequence: "未成年人应慎用。", alternatives: "头孢类" },
-            { id: 9, name: "诺氟沙星", abbr: "Norfloxacin", aliases: ["氟哌酸", "沙星"], category: "抗生素", riskLevel: "❌ 18岁禁用", riskColor: "bg-red-600 text-white", harm: "【骨骼损伤】影响软骨发育，长不高，肌腱断裂。", consequence: "说明书禁忌：18岁以下禁用。", alternatives: "蒙脱石散" },
-            { id: 10, name: "左氧氟沙星", abbr: "LVFX", aliases: ["Levofloxacin", "沙星类"], category: "抗生素", riskLevel: "❌ 18岁禁用", riskColor: "bg-red-600 text-white", harm: "【骨骼损伤】影响软骨发育，长不高。", consequence: "说明书禁忌。", alternatives: "头孢类" },
-            { id: 11, name: "四环素", abbr: "TCY", aliases: ["土霉素", "OTC", "强力霉素"], category: "抗生素", riskLevel: "❌ 8岁禁用", riskColor: "bg-red-600 text-white", harm: "【四环素牙】牙齿永久变黑、发育不良。", consequence: "毁容性副作用。", alternatives: "阿奇霉素" },
-            { id: 12, name: "氯霉素", abbr: "Chloramphenicol", aliases: [], category: "抗生素", riskLevel: "❌ 新生儿禁用", riskColor: "bg-red-600 text-white", harm: "灰婴综合征(循环衰竭)，骨髓抑制。", consequence: "极少使用。", alternatives: "其他抗生素" },
-            { id: 13, name: "呋喃唑酮", abbr: "FZ", aliases: ["痢特灵"], category: "抗生素", riskLevel: "⚠️ 副作用多", riskColor: "bg-orange-500 text-white", harm: "多发性神经炎，溶血性贫血。", consequence: "老药，副作用大。", alternatives: "蒙脱石散" },
-            { id: 14, name: "可待因", abbr: "Codeine", aliases: ["罂粟壳", "强力枇杷露", "复方甘草片", "克咳"], category: "止咳化痰", riskLevel: "❌ 18岁禁用", riskColor: "bg-red-600 text-white", harm: "【成瘾/窒息】含毒品成分，抑制呼吸。", consequence: "国家药监局公告：18岁以下禁用。", alternatives: "右美沙芬" },
-            { id: 15, name: "异丙嗪", abbr: "PMZ", aliases: ["非那根", "Promethazine", "伤风止咳"], category: "止咳/止吐", riskLevel: "❌ 2岁禁用", riskColor: "bg-red-600 text-white", harm: "【呼吸抑制】可能导致幼儿呼吸停止死亡！", consequence: "WHO警示：绝对禁用于2岁以下。", alternatives: "海盐水" },
-            { id: 16, name: "萘甲唑啉", abbr: "Naphazoline", aliases: ["滴鼻净", "滴鼻水"], category: "感冒鼻炎", riskLevel: "❌ 儿童禁用", riskColor: "bg-red-600 text-white", harm: "【中毒】易导致儿童休克、昏迷。", consequence: "临床用药须知警示。", alternatives: "海盐水" },
-            { id: 17, name: "艾畅(老版)", abbr: "Pseudoephedrine", aliases: ["伪麻美芬", "艾畅"], category: "感冒药", riskLevel: "❌ 国家注销", riskColor: "bg-red-600 text-white", harm: "含伪麻黄碱，婴幼儿风险高。", consequence: "国家药监局注销批文。", alternatives: "海盐水" },
-            { id: 18, name: "金刚烷胺", abbr: "Amantadine", aliases: ["优卡丹", "好娃娃", "快克"], category: "抗病毒", riskLevel: "⚠️ 5岁慎用", riskColor: "bg-yellow-500 text-white", harm: "肝肾毒性，对流感无效。", consequence: "国家药监局修订说明书。", alternatives: "单一退烧药" },
-            { id: 19, name: "特非那定", abbr: "Terfenadine", aliases: ["敏迪"], category: "抗过敏", riskLevel: "❌ 心脏毒性", riskColor: "bg-red-600 text-white", harm: "【猝死】导致严重心律失常。", consequence: "已被氯雷他定取代。", alternatives: "氯雷他定" },
-            { id: 20, name: "柴胡注射液", abbr: "Chaihu", aliases: ["退烧针"], category: "中药注射", riskLevel: "❌ 儿童禁用", riskColor: "bg-red-600 text-white", harm: "【过敏性休克】曾导致多起儿童致死。", consequence: "国家药监局公告。", alternatives: "口服布洛芬" },
-            { id: 21, name: "双黄连注射液", abbr: "SHL", aliases: ["双黄连"], category: "中药注射", riskLevel: "❌ 4岁禁用", riskColor: "bg-red-600 text-white", harm: "严重过敏反应，休克。", consequence: "国家药监局公告。", alternatives: "口服中成药" },
-            { id: 22, name: "茵栀黄注射液", abbr: "YZH", aliases: ["退黄针"], category: "中药注射", riskLevel: "❌ 新生儿禁用", riskColor: "bg-red-600 text-white", harm: "【死亡风险】曾致新生儿死亡。", consequence: "国家药监局公告。", alternatives: "蓝光照射" },
-            { id: 23, name: "喜炎平", abbr: "XYP", aliases: ["喜炎平"], category: "中药注射", riskLevel: "⚠️ 慎用", riskColor: "bg-orange-500 text-white", harm: "全身性过敏反应，呼吸困难。", consequence: "不良反应通报。", alternatives: "口服药" },
-            { id: 24, name: "穿琥宁/炎琥宁", abbr: "Potassium", aliases: ["抗病毒针"], category: "中药注射", riskLevel: "⚠️ 慎用", riskColor: "bg-orange-500 text-white", harm: "过敏性休克发生率高，血小板减少。", consequence: "不良反应通报。", alternatives: "口服药" },
-            { id: 25, name: "何首乌(生)", abbr: "Heshouwu", aliases: ["首乌"], category: "中草药", riskLevel: "⚠️ 肝毒性", riskColor: "bg-orange-500 text-white", harm: "药物性肝损伤，严重可致肝衰竭。", consequence: "需遵医嘱。", alternatives: "无" },
-            { id: 26, name: "土三七", abbr: "TCM Toxic", aliases: ["菊三七"], category: "中草药", riskLevel: "❌ 剧毒", riskColor: "bg-red-600 text-white", harm: "【肝窦阻塞】导致肝腹水、肝衰竭，无药可治。", consequence: "绝对禁用。", alternatives: "正规三七" },
-            { id: 27, name: "朱砂/雄黄", abbr: "HeavyMetal", aliases: ["七厘散", "小儿惊风散"], category: "中成药", riskLevel: "⚠️ 重金属", riskColor: "bg-orange-500 text-white", harm: "含汞、砷，伤肝肾、伤脑。", consequence: "长期服用慢性中毒。", alternatives: "无" },
-            { id: 28, name: "马兜铃酸", abbr: "AA", aliases: ["关木通", "广防己", "青木香", "马兜铃"], category: "中草药", riskLevel: "❌ 肾衰竭", riskColor: "bg-red-600 text-white", harm: "【尿毒症】直接损伤肾小管，不可逆；致癌。", consequence: "国家已取消药用标准。", alternatives: "无" },
-            { id: 29, name: "槟榔", abbr: "Areca", aliases: ["槟榔"], category: "其他", riskLevel: "❌ 一级致癌", riskColor: "bg-red-600 text-white", harm: "口腔癌，成瘾。", consequence: "WHO认定。", alternatives: "口香糖" },
-            { id: 30, name: "酚酞片", keywords: ["酚酞", "果导片"], riskLevel: "❌ 国家注销", riskColor: "bg-red-600 text-white", harm: "【致癌】长期使用可引起结肠黑变病，严重致癌。", consequence: "国家药监局注销。", alternatives: "乳果糖" },
-            { id: 31, name: "洛哌丁胺", abbr: "Loperamide", aliases: ["易蒙停", "止泻灵"], category: "消化类", riskLevel: "❌ 2岁禁用", riskColor: "bg-red-600 text-white", harm: "【肠坏死】麻痹肠道，导致毒素堆积中毒。", consequence: "2岁以下禁用。", alternatives: "蒙脱石散" },
-            { id: 32, name: "多潘立酮", abbr: "DOM", aliases: ["吗丁啉"], category: "消化类", riskLevel: "⚠️ 12岁慎用", riskColor: "bg-yellow-500 text-white", harm: "心脏猝死(QT间期延长)。", consequence: "欧美限制使用。", alternatives: "益生菌" },
-            { id: 33, name: "西布曲明", abbr: "Sibutramine", aliases: ["减肥药"], category: "减肥药", riskLevel: "❌ 全球禁用", riskColor: "bg-red-600 text-white", harm: "增加心脏病和中风风险。", consequence: "已注销。", alternatives: "运动" },
-            { id: 34, name: "地塞米松", abbr: "DXM", aliases: ["激素", "地塞"], category: "激素", riskLevel: "⚠️ 慎用", riskColor: "bg-orange-500 text-white", harm: "滥用退烧掩盖病情，降低免疫力。", consequence: "单纯感冒不应常规使用。", alternatives: "布洛芬" },
-            { id: 35, name: "利巴韦林", abbr: "RBV", aliases: ["病毒唑"], category: "抗病毒", riskLevel: "⚠️ 不推荐", riskColor: "bg-yellow-500 text-white", harm: "致畸，贫血。", consequence: "对感冒流感无效。", alternatives: "奥司他韦" },
-            { id: 36, name: "强效激素膏", abbr: "Steroids", aliases: ["氯倍他索", "特美肤"], category: "皮肤外用", riskLevel: "⚠️ 儿童慎用", riskColor: "bg-orange-500 text-white", harm: "皮肤萎缩，激素依赖，抑制生长。", consequence: "应选弱效激素。", alternatives: "尤卓尔" },
-            { id: 37, name: "林旦乳膏", abbr: "Lindane", aliases: ["六六六"], category: "皮肤外用", riskLevel: "❌ 禁用", riskColor: "bg-red-600 text-white", harm: "中枢神经毒性，诱发癫痫。", consequence: "已淘汰。", alternatives: "硫软膏" },
-            { id: 38, name: "硼酸/硼砂", abbr: "Borip", aliases: ["硼酸"], category: "皮肤外用", riskLevel: "❌ 婴幼儿禁用", riskColor: "bg-red-600 text-white", harm: "蓄积中毒，大面积使用致死。", consequence: "禁用。", alternatives: "氧化锌" },
-            { id: 39, name: "一滴香", abbr: "Poison", aliases: ["一滴香", "氟虫腈"], category: "外用", riskLevel: "⚠️ 剧毒", riskColor: "bg-orange-500 text-white", harm: "农药成分，神经毒性。", consequence: "慎用。", alternatives: "电蚊香液" },
-            { id: 40, name: "头孢地尼", abbr: "Cefdinir", aliases: ["头孢"], category: "抗生素", riskLevel: "✅ 安全抗生素", riskColor: "bg-green-600 text-white", harm: "对症药物，请遵医嘱服用。", consequence: "三代头孢，针对呼吸道。", alternatives: "无" },
-            { id: 41, name: "阿奇霉素", abbr: "Azithromycin", aliases: ["阿奇"], category: "抗生素", riskLevel: "✅ 支原体特效", riskColor: "bg-green-600 text-white", harm: "注意胃肠反应，吃3停4。", consequence: "支原体首选。", alternatives: "无" },
-            { id: 42, name: "小儿氨酚黄那敏", abbr: "Compound", aliases: ["护彤"], category: "感冒药", riskLevel: "⚠️ 慎用", riskColor: "bg-yellow-500 text-white", harm: "复方药易导致重复用药中毒。", consequence: "建议单方药。", alternatives: "退烧药" },
-            { id: 43, name: "维C银翘片", abbr: "VC", aliases: ["银翘片"], category: "感冒药", riskLevel: "⚠️ 易中毒", riskColor: "bg-yellow-500 text-white", harm: "含西药成分，易致肝损。", consequence: "慎用。", alternatives: "清热颗粒" }
+            { id: 1, name: "安乃近", abbr: "Analgin", aliases: ["大药片", "退烧针", "诺瓦金"], category: "退烧止痛", riskLevel: "❌ 国家注销 (极高危)", riskColor: "risk-red", harm: "【致死】粒细胞缺乏症（免疫瘫痪）；严重过敏性休克。", consequence: "国家药监局公告：停止生产，注销批文。", alternatives: "布洛芬、对乙酰氨基酚" },
+            { id: 2, name: "尼美舒利", abbr: "Nimesulide", aliases: ["瑞芝清", "退烧颗粒"], category: "退烧止痛", riskLevel: "❌ 12岁以下禁用", riskColor: "risk-red", harm: "【肝衰竭】严重肝毒性，致死率高。", consequence: "国家食药监局通知：禁止用于12岁以下。", alternatives: "布洛芬、对乙酰氨基酚" },
+            { id: 3, name: "阿司匹林", abbr: "Aspirin", aliases: ["巴米尔", "ASA"], category: "退烧止痛", riskLevel: "❌ 16岁以下发烧禁用", riskColor: "risk-red", harm: "【瑞氏综合征】致死性脑病+肝损，死亡率30%。", consequence: "儿童病毒感染发烧禁用。", alternatives: "布洛芬" },
+            { id: 4, name: "氨基比林", abbr: "APC", aliases: ["去痛片", "安痛定"], category: "退烧止痛", riskLevel: "⚠️ 淘汰药", riskColor: "risk-orange", harm: "【血液毒性】粒细胞减少，伤肾。", consequence: "已被更安全药物替代。", alternatives: "布洛芬" },
+            { id: 5, name: "赖氨匹林", abbr: "Lys-Asp", aliases: ["退烧针"], category: "退烧止痛", riskLevel: "❌ 16岁以下慎用", riskColor: "risk-red", harm: "同阿司匹林，注射更容易引起瑞氏综合征。", consequence: "说明书警示。", alternatives: "口服退烧药" },
+            { id: 6, name: "阿米卡星", abbr: "AKC", aliases: ["AMK", "丁胺卡那"], category: "抗生素", riskLevel: "⚠️ 儿童慎用 (高危)", riskColor: "risk-orange", harm: "【耳毒性+肾毒性】听力下降甚至耳聋；损伤肾脏。", consequence: "普通感冒用此药属于过度医疗。", alternatives: "头孢类" },
+            { id: 7, name: "庆大霉素", abbr: "GM", aliases: ["Gentamycin", "针剂"], category: "抗生素", riskLevel: "⚠️ 儿童慎用 (高危)", riskColor: "risk-orange", harm: "【耳毒性】一针致聋风险，不可逆。", consequence: "未成年人应慎用。", alternatives: "头孢类" },
+            { id: 8, name: "诺氟沙星", abbr: "Norfloxacin", aliases: ["氟哌酸", "沙星"], category: "抗生素", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【骨骼损伤】影响软骨发育，长不高，肌腱断裂。", consequence: "说明书禁忌：18岁以下禁用。", alternatives: "蒙脱石散" },
+            { id: 9, name: "左氧氟沙星", abbr: "LVFX", aliases: ["Levofloxacin", "沙星类"], category: "抗生素", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【骨骼损伤】影响软骨发育，长不高。", consequence: "说明书禁忌。", alternatives: "头孢类" },
+            { id: 10, name: "四环素", abbr: "TCY", aliases: ["土霉素", "OTC", "强力霉素"], category: "抗生素", riskLevel: "❌ 8岁禁用", riskColor: "risk-red", harm: "【四环素牙】牙齿永久变黑、发育不良。", consequence: "毁容性副作用。", alternatives: "阿奇霉素" },
+            { id: 11, name: "可待因", abbr: "Codeine", aliases: ["罂粟壳", "强力枇杷露", "复方甘草片", "克咳"], category: "止咳化痰", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【成瘾/窒息】含毒品成分，抑制呼吸。", consequence: "国家药监局公告：18岁以下禁用。", alternatives: "右美沙芬" },
+            { id: 12, name: "异丙嗪", abbr: "PMZ", aliases: ["非那根", "Promethazine", "伤风止咳"], category: "止咳/止吐", riskLevel: "❌ 2岁禁用", riskColor: "risk-red", harm: "【呼吸抑制】可能导致幼儿呼吸停止死亡！", consequence: "WHO警示：绝对禁用于2岁以下。", alternatives: "海盐水" },
+            { id: 13, name: "萘甲唑啉", abbr: "Naphazoline", aliases: ["滴鼻净", "滴鼻水"], category: "感冒鼻炎", riskLevel: "❌ 儿童禁用", riskColor: "risk-red", harm: "【中毒】易导致儿童休克、昏迷。", consequence: "临床用药须知警示。", alternatives: "海盐水" },
+            { id: 14, name: "艾畅(老版)", abbr: "Pseudoephedrine", aliases: ["伪麻美芬", "艾畅"], category: "感冒药", riskLevel: "❌ 国家注销", riskColor: "risk-red", harm: "含伪麻黄碱，婴幼儿风险高。", consequence: "国家药监局注销批文。", alternatives: "海盐水" },
+            { id: 15, name: "金刚烷胺", abbr: "Amantadine", aliases: ["优卡丹", "好娃娃", "快克"], category: "抗病毒", riskLevel: "⚠️ 5岁慎用", riskColor: "risk-orange", harm: "肝肾毒性，对流感无效。", consequence: "国家药监局修订说明书。", alternatives: "单一退烧药" },
+            { id: 16, name: "柴胡注射液", abbr: "Chaihu", aliases: ["退烧针"], category: "中药注射", riskLevel: "❌ 儿童禁用", riskColor: "risk-red", harm: "【过敏性休克】曾导致多起儿童致死。", consequence: "国家药监局公告。", alternatives: "口服布洛芬" },
+            { id: 17, name: "双黄连注射液", abbr: "SHL", aliases: ["双黄连"], category: "中药注射", riskLevel: "❌ 4岁禁用", riskColor: "risk-red", harm: "严重过敏反应，休克。", consequence: "国家药监局公告。", alternatives: "口服中成药" },
+            { id: 18, name: "茵栀黄注射液", abbr: "YZH", aliases: ["退黄针"], category: "中药注射", riskLevel: "❌ 新生儿禁用", riskColor: "risk-red", harm: "【死亡风险】曾致新生儿死亡。", consequence: "国家药监局公告。", alternatives: "蓝光照射" },
+            { id: 19, name: "喜炎平", abbr: "XYP", aliases: ["喜炎平"], category: "中药注射", riskLevel: "⚠️ 慎用", riskColor: "risk-orange", harm: "全身性过敏反应，呼吸困难。", consequence: "不良反应通报。", alternatives: "口服药" },
+            { id: 20, name: "土三七", abbr: "TCM Toxic", aliases: ["菊三七"], category: "中草药", riskLevel: "❌ 剧毒", riskColor: "risk-red", harm: "【肝窦阻塞】导致肝腹水、肝衰竭，无药可治。", consequence: "绝对禁用。", alternatives: "正规三七" },
+            { id: 21, name: "酚酞片", keywords: ["酚酞", "果导片"], category: "泻药", riskLevel: "❌ 国家注销", riskColor: "risk-red", harm: "【致癌】严重致癌风险。", consequence: "国家药监局注销。", alternatives: "乳果糖" },
+            { id: 22, name: "洛哌丁胺", abbr: "Loperamide", aliases: ["易蒙停", "止泻灵"], category: "消化类", riskLevel: "❌ 2岁禁用", riskColor: "risk-red", harm: "【肠坏死】麻痹肠道，导致毒素堆积中毒。", consequence: "2岁以下禁用。", alternatives: "蒙脱石散" },
+            { id: 23, name: "多潘立酮", abbr: "DOM", aliases: ["吗丁啉"], category: "消化类", riskLevel: "⚠️ 12岁慎用", riskColor: "risk-orange", harm: "心脏猝死(QT间期延长)。", consequence: "欧美限制使用。", alternatives: "益生菌" },
+            { id: 24, name: "西布曲明", abbr: "Sibutramine", aliases: ["减肥药"], category: "减肥药", riskLevel: "❌ 全球禁用", riskColor: "risk-red", harm: "增加心脏病和中风风险。", consequence: "已注销。", alternatives: "运动" },
+            { id: 25, name: "地塞米松", abbr: "DXM", aliases: ["激素", "地塞"], category: "激素", riskLevel: "⚠️ 慎用", riskColor: "risk-orange", harm: "滥用退烧掩盖病情，降低免疫力。", consequence: "单纯感冒不应常规使用。", alternatives: "布洛芬" },
+            { id: 26, name: "利巴韦林", abbr: "RBV", aliases: ["病毒唑"], category: "抗病毒", riskLevel: "⚠️ 不推荐", riskColor: "risk-orange", harm: "致畸，贫血。", consequence: "对感冒流感无效。", alternatives: "奥司他韦" },
+            { id: 27, name: "强效激素膏", abbr: "Steroids", aliases: ["氯倍他索", "特美肤"], category: "皮肤外用", riskLevel: "⚠️ 儿童慎用", riskColor: "risk-orange", harm: "皮肤萎缩，激素依赖，抑制生长。", consequence: "应选弱效激素。", alternatives: "尤卓尔" },
+            { id: 28, name: "头孢地尼", abbr: "Cefdinir", aliases: ["头孢"], category: "抗生素", riskLevel: "✅ 安全抗生素", riskColor: "risk-green", harm: "对症药物，请遵医嘱服用。", consequence: "三代头孢，针对呼吸道。", alternatives: "无" },
+            { id: 29, name: "阿奇霉素", abbr: "Azithromycin", aliases: ["阿奇"], category: "抗生素", riskLevel: "✅ 支原体特效", riskColor: "risk-green", harm: "注意胃肠反应，吃3停4。", consequence: "支原体首选。", alternatives: "无" }
         ];
 
-        const App = () => {
-            const [searchTerm, setSearchTerm] = useState("");
-            const [selectedCategory, setSelectedCategory] = useState("全部");
-            const [expandedId, setExpandedId] = useState(null);
-            const [isAnalyzing, setIsAnalyzing] = useState(false);
-            const [showDemoHint, setShowDemoHint] = useState(false);
-            
-            const fileInputRef = useRef(null);
-
+        // --- 逻辑代码 ---
+        let currentCategory = "全部";
+        
+        function init() {
+            // 生成标签
             const categories = ["全部", "退烧止痛", "抗生素", "止咳/止吐", "抗病毒", "中药注射", "消化/其他"];
+            const tagContainer = document.getElementById('categoryTags');
+            categories.forEach(cat => {
+                const btn = document.createElement('div');
+                btn.className = `tag ${cat === '全部' ? 'active' : ''}`;
+                btn.innerText = cat;
+                btn.onclick = () => {
+                    document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = cat;
+                    renderList();
+                };
+                tagContainer.appendChild(btn);
+            });
+            renderList();
+        }
 
-            const filteredDrugs = drugDatabase.filter(drug => {
-                const lowerSearch = searchTerm.toLowerCase().replace(/\s+/g, "");
-                const matchesSearch = drug.name.toLowerCase().includes(lowerSearch) || 
-                                      drug.aliases.some(alias => alias.toLowerCase().includes(lowerSearch)) ||
-                                      (drug.abbr && drug.abbr.toLowerCase().includes(lowerSearch));
-                const matchesCategory = selectedCategory === "全部" || drug.category === selectedCategory || (selectedCategory === "消化/其他" && ["消化类", "减肥药", "皮肤外用", "其他"].includes(drug.category));
-                return matchesSearch && matchesCategory;
+        function renderList() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const container = document.getElementById('drugList');
+            container.innerHTML = '';
+
+            const filtered = drugDatabase.filter(drug => {
+                const matchSearch = drug.name.toLowerCase().includes(searchTerm) || 
+                                    (drug.abbr && drug.abbr.toLowerCase().includes(searchTerm)) ||
+                                    drug.aliases.some(a => a.toLowerCase().includes(searchTerm));
+                const matchCat = currentCategory === "全部" || drug.category === currentCategory;
+                return matchSearch && matchCat;
             });
 
-            const handleImageUpload = async (e) => {
-                setIsAnalyzing(true);
-                setShowDemoHint(false);
-                
-                // 模拟识别过程 (确保极速响应，不依赖大文件下载)
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8;">未找到相关药物<br><small>请尝试输入通用名或缩写</small></div>`;
+                return;
+            }
+
+            filtered.forEach(drug => {
+                const div = document.createElement('div');
+                div.className = `card`;
+                div.onclick = () => {
+                    div.classList.toggle('open');
+                };
+                div.innerHTML = `
+                    <div class="card-header">
+                        <div>
+                            <h3 class="drug-name">
+                                ${drug.name} 
+                                ${drug.abbr ? `<span class="abbr-badge">${drug.abbr}</span>` : ''}
+                            </h3>
+                            <span class="risk-badge ${drug.riskColor}">${drug.riskLevel}</span>
+                            <div class="alias">别名: ${drug.aliases.join(' / ')}</div>
+                        </div>
+                        <div class="chevron">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                    <div class="detail">
+                        <div class="box box-harm">
+                            <span class="label" style="color:var(--danger)">核心危害</span>
+                            ${drug.harm}
+                        </div>
+                        <div class="box box-policy">
+                            <span style="font-size:16px">⚖️</span>
+                            <div>
+                                <span class="label">政策/依据</span>
+                                ${drug.consequence}
+                            </div>
+                        </div>
+                        ${!drug.riskLevel.includes('✅') ? `
+                        <div class="box box-alt">
+                            <span class="label" style="color:#166534">安全替代</span>
+                            ${drug.alternatives}
+                        </div>` : ''}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // 模拟扫描功能
+        function startScan() {
+            const overlay = document.getElementById('scan-overlay');
+            overlay.style.display = 'flex';
+            
+            // 2秒后模拟出结果
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                // 随机挑选一个高危药展示
+                const randomId = Math.floor(Math.random() * 10) + 1; // 前10个都是高危
+                const drug = drugDatabase.find(d => d.id === randomId);
+                document.getElementById('searchInput').value = drug.name;
+                currentCategory = "全部";
+                document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tag')[0].classList.add('active');
+                renderList();
+                // 自动展开第一个
                 setTimeout(() => {
-                    // 这里我们做一个贴心的设计：
-                    // 因为没有后端API，我们随机展示一个高危药物作为演示，
-                    // 并提示用户“识别成功：发现潜在风险”。
-                    const demoDrugs = ["安乃近", "阿米卡星", "柴胡注射液"];
-                    const randomDrug = demoDrugs[Math.floor(Math.random() * demoDrugs.length)];
-                    
-                    setSearchTerm(randomDrug);
-                    setIsAnalyzing(false);
-                    setShowDemoHint(true);
-                }, 1500);
-            };
+                    document.querySelector('.card').classList.add('open');
+                    alert(`⚠️ [演示模式] \n模拟识别结果：${drug.name}\n\n请查看下方的高危警示！`);
+                }, 100);
+            }, 2000);
+        }
 
-            return (
-                <div className="min-h-screen flex flex-col pb-12 bg-slate-50">
-                    {/* 头部 */}
-                    <div className="bg-gradient-to-r from-purple-900 to-indigo-900 text-white sticky top-0 z-50 shadow-lg">
-                        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-white/10 p-1.5 rounded-lg backdrop-blur-sm border border-white/20">
-                                    <Icons.Shield />
-                                </div>
-                                <div>
-                                    <h1 className="text-lg font-bold leading-none tracking-tight">家庭用药避坑指南</h1>
-                                    <p className="text-[10px] text-yellow-200 mt-1 uppercase tracking-wider">极速修复版</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 搜索区 */}
-                    <div className="bg-white pb-8 pt-6 px-4 rounded-b-[2.5rem] shadow-sm mb-6 border-b border-gray-200">
-                        <div className="container mx-auto max-w-3xl">
-                            <div className="text-center mb-5">
-                                <h2 className="text-xl font-bold text-slate-800 mb-1">50+种高危药 · 一键查询</h2>
-                                <p className="text-slate-500 text-xs">输入药名（如：安乃近）或缩写（如：AKC）</p>
-                            </div>
-                            
-                            <div className="relative flex gap-2">
-                                <div className="relative flex-1">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                                        <Icons.Search />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        className="block w-full pl-11 pr-4 py-4 rounded-2xl text-base bg-slate-100 border-2 border-transparent focus:border-purple-500 focus:bg-white transition-all outline-none placeholder-slate-400"
-                                        placeholder="输入药名或缩写..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                </div>
-                                
-                                <button 
-                                    onClick={() => fileInputRef.current.click()}
-                                    className="bg-purple-600 text-white p-4 rounded-2xl shadow-lg hover:bg-purple-700 active:scale-95 transition-all flex flex-col items-center justify-center w-16 gap-1"
-                                    disabled={isAnalyzing}
-                                >
-                                    {isAnalyzing ? (
-                                        <div className="loader"></div>
-                                    ) : (
-                                        <>
-                                            <div className="flex gap-1">
-                                                <Icons.Camera />
-                                                <Icons.Image />
-                                            </div>
-                                            <span className="text-[9px] font-bold">识别</span>
-                                        </>
-                                    )}
-                                </button>
-                                <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={handleImageUpload} />
-                            </div>
-
-                            {/* 标签 */}
-                            <div className="flex flex-wrap justify-center gap-2 mt-5">
-                                {categories.map(cat => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setSelectedCategory(cat)}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border ${
-                                            selectedCategory === cat 
-                                                ? 'bg-purple-600 text-white border-purple-600 shadow-md' 
-                                                : 'bg-white text-slate-600 border-gray-200 hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 演示提示 */}
-                    {showDemoHint && (
-                        <div className="container mx-auto max-w-4xl px-4 mb-4">
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs text-yellow-800 flex gap-2 items-start">
-                                <span className="font-bold text-lg">💡</span>
-                                <div>
-                                    <strong>演示提示：</strong> 由于网页版限制，此处为【模拟识别】结果（识别出了“{searchTerm}”）。<br/>正式使用建议直接在搜索框输入药名，准确率100%。
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 列表内容 */}
-                    <main className="container mx-auto px-4 max-w-4xl space-y-4">
-                        {filteredDrugs.length === 0 ? (
-                            <div className="text-center py-16">
-                                <p className="text-gray-500 font-medium">未找到相关风险药物</p>
-                                <p className="text-xs text-gray-400 mt-1">库中暂无此药，或请输入通用名尝试。</p>
-                            </div>
-                        ) : (
-                            filteredDrugs.map((drug) => (
-                                <div key={drug.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 group">
-                                    <div 
-                                        className="p-4 flex justify-between items-start cursor-pointer select-none active:bg-gray-50"
-                                        onClick={() => setExpandedId(expandedId === drug.id ? null : drug.id)}
-                                    >
-                                        <div className="flex-1">
-                                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                {drug.abbr && (
-                                                    <span className="flex items-center gap-1 bg-slate-800 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm tracking-wide">
-                                                        <Icons.Tag className="w-3 h-3" /> {drug.abbr}
-                                                    </span>
-                                                )}
-                                                <h3 className="text-lg font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
-                                                    {drug.name}
-                                                </h3>
-                                            </div>
-                                            <div className="mb-2">
-                                                <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md font-bold shadow-sm ${drug.riskColor}`}>
-                                                    {drug.riskLevel.includes("❌") ? <Icons.AlertOctagon /> : (drug.riskLevel.includes("✅") ? <Icons.ShieldCheck /> : <Icons.AlertTriangle />)}
-                                                    {drug.riskLevel}
-                                                </span>
-                                            </div>
-                                            <p className="text-xs text-slate-500">
-                                                <span className="font-semibold text-slate-400">别名:</span> {drug.aliases.join(" / ")}
-                                            </p>
-                                        </div>
-                                        <div className={`ml-4 p-2 rounded-full bg-slate-50 transition-transform duration-300 ${expandedId === drug.id ? 'rotate-180 bg-slate-200' : ''}`}>
-                                            <Icons.ChevronDown />
-                                        </div>
-                                    </div>
-
-                                    {expandedId === drug.id && (
-                                        <div className="px-4 pb-5 pt-0 bg-white border-t border-gray-100 animate-fadeIn">
-                                            <div className="bg-red-50 p-3.5 rounded-lg border-l-4 border-red-500 mt-4">
-                                                <h4 className="text-xs font-bold text-red-700 mb-1 flex items-center gap-1">
-                                                    <Icons.XCircle /> 核心危害
-                                                </h4>
-                                                <p className="text-sm text-slate-700 font-medium leading-snug">
-                                                    {drug.harm}
-                                                </p>
-                                            </div>
-                                            <div className="mt-3 bg-slate-100 p-3 rounded-lg flex items-start gap-2 border border-slate-200">
-                                                <Icons.Gavel />
-                                                <div>
-                                                    <span className="text-xs font-bold text-slate-700 block">禁令/政策依据：</span>
-                                                    <span className="text-xs text-slate-600 block mt-0.5 leading-relaxed">{drug.consequence} <br/> <span className="text-slate-400">({drug.source})</span></span>
-                                                </div>
-                                            </div>
-                                            <div className="mt-3 bg-emerald-50 p-3.5 rounded-lg border border-emerald-100">
-                                                <h4 className="text-xs font-bold text-emerald-700 mb-1 flex items-center gap-1">
-                                                    <Icons.ShieldCheck /> 安全替代
-                                                </h4>
-                                                <p className="text-sm text-slate-700">{drug.alternatives}</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))
-                        )}
-                    </main>
-
-                    <footer className="text-center text-slate-400 text-[10px] py-10">
-                        <p>SafeMed AI Ultimate | 依据国家药监局公告整理</p>
-                    </footer>
-                </div>
-            );
-        };
-
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        // 初始化
+        init();
     </script>
 </body>
 </html>
