@@ -5,35 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>家庭用药避坑指南 | 救援版 Ultimate</title>
     
-    <!-- === 图标设置开始 === -->
-    <!-- 1. 这里的 href="icon.png" 改成你的图片文件名 -->
     <link rel="icon" type="image/png" href="icon.png">
-    
-    <!-- 2. iOS 专用图标 (添加到主屏幕时显示) -->
     <link rel="apple-touch-icon" href="icon.png">
-    
-    <!-- 3. 让 App 全屏运行 (看起来更像原生 App) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- === 图标设置结束 === -->
+    
     <style>
         /* --- 基础样式 --- */
-        :root { --primary: #4f46e5; --danger: #dc2626; --warning: #d97706; --success: #10b981; --bg: #f1f5f9; --text-main: #1e293b; --text-sub: #64748b; }
+        :root { 
+            --primary: #4f46e5; 
+            --danger: #dc2626; 
+            --warning: #d97706; 
+            --success: #10b981; 
+            --bg: #f1f5f9; 
+            --card-bg: #ffffff;
+            --text-main: #1e293b; 
+            --text-sub: #64748b; 
+            --border: #e2e8f0;
+            --input-bg: #f8fafc;
+        }
+
+        body.dark-mode {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f1f5f9;
+            --text-sub: #94a3b8;
+            --border: #334155;
+            --input-bg: #334155;
+        }
+        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background: var(--bg); color: var(--text-main); padding-bottom: 80px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background: var(--bg); color: var(--text-main); padding-bottom: 100px; transition: background 0.3s; }
         
         /* 头部样式 */
-        header { background: linear-gradient(135deg, #4338ca 0%, #312e81 100%); color: white; padding: 16px 16px 30px 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .header-content { max-width: 800px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+        header { background: linear-gradient(135deg, #4338ca 0%, #312e81 100%); color: white; padding: 16px 16px 30px 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .header-content { display: flex; align-items: center; gap: 12px; }
         .logo-icon { background: rgba(255,255,255,0.2); padding: 6px; border-radius: 8px; display: flex; }
+        .header-actions { display: flex; gap: 10px; }
+        .icon-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
+
+        /* 指南卡片区 (横向滚动) */
+        .guide-section { margin: -25px 0 10px 0; padding: 0 16px; position: relative; z-index: 101; }
+        .guide-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .guide-scroll::-webkit-scrollbar { display: none; }
         
+        .guide-card {
+            flex: 0 0 auto;
+            width: 110px;
+            height: 105px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .guide-card:active { transform: scale(0.95); }
+        .guide-icon { font-size: 24px; margin-bottom: 5px; }
+        .guide-title { font-weight: 800; font-size: 13px; color: var(--text-main); }
+        .guide-sub { font-size: 10px; color: var(--text-sub); opacity: 0.8; margin-top: 2px; }
+        .guide-bg { position: absolute; top: -10px; right: -10px; width: 60px; height: 60px; border-radius: 50%; opacity: 0.15; }
+
         /* 搜索区样式 */
-        .search-section { background: white; padding: 20px; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); margin: -20px 16px 20px 16px; position: relative; z-index: 101; max-width: 800px; left: 0; right: 0; }
-        @media (min-width: 832px) { .search-section { margin: -20px auto 20px auto; } }
+        .search-section { background: var(--card-bg); padding: 20px; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); margin: 0 16px 20px 16px; transition: background 0.3s; }
+        @media (min-width: 832px) { .search-section { margin: 0 auto 20px auto; max-width: 800px; } }
 
         .search-container { position: relative; display: flex; gap: 10px; margin-bottom: 15px; }
-        input { width: 100%; padding: 14px 14px 14px 44px; font-size: 16px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none; transition: all 0.3s; background: #f8fafc; color: var(--text-main); }
-        input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        input { width: 100%; padding: 14px 14px 14px 44px; font-size: 16px; border: 2px solid var(--border); border-radius: 12px; outline: none; transition: all 0.3s; background: var(--input-bg); color: var(--text-main); }
+        input:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
         
         .cam-btn { background: var(--primary); color: white; border: none; padding: 0 16px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; min-width: 60px; transition: 0.2s; }
@@ -42,54 +88,88 @@
         /* 标签按钮 */
         .tags { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .tags::-webkit-scrollbar { display: none; }
-        .tag { white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; font-size: 13px; color: var(--text-sub); background: white; cursor: pointer; transition: 0.2s; }
+        .tag { white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); font-size: 13px; color: var(--text-sub); background: var(--card-bg); cursor: pointer; transition: 0.2s; }
         .tag.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: 500; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3); }
         .tag.fav-active { background: var(--warning); border-color: var(--warning); color: white; }
 
         /* 列表卡片样式 */
         .list-container { max-width: 800px; margin: 0 auto; padding: 0 16px; }
-        .card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; transition: all 0.2s; cursor: pointer; position: relative; }
-        .card:active { transform: scale(0.99); background-color: #fafafa; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border: 1px solid var(--border); transition: all 0.2s; cursor: pointer; position: relative; }
+        .card:active { transform: scale(0.99); }
         
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; padding-right: 20px; }
         .drug-name { font-size: 18px; font-weight: 800; color: var(--text-main); margin: 0; line-height: 1.4; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
         
-        /* 简称标签 */
-        .abbr-badge { font-size: 11px; background: #f1f5f9; color: #475569; padding: 3px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: normal; display: inline-flex; align-items: center; }
-        .abbr-badge b { opacity: 0.7; font-weight: bold; margin-right: 4px; font-size: 10px; color: #334155; }
+        .abbr-badge { font-size: 11px; background: var(--bg); color: var(--text-sub); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); font-weight: normal; display: inline-flex; align-items: center; }
+        .abbr-badge b { opacity: 0.7; font-weight: bold; margin-right: 4px; font-size: 10px; }
 
         .risk-badge { font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; margin-top: 8px; display: inline-block; }
         .risk-red { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
         .risk-orange { background: #fff7ed; color: var(--warning); border: 1px solid #fed7aa; }
         .risk-green { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
         
+        body.dark-mode .risk-red { background: rgba(220, 38, 38, 0.2); border-color: rgba(220, 38, 38, 0.3); }
+        body.dark-mode .risk-orange { background: rgba(217, 119, 6, 0.2); border-color: rgba(217, 119, 6, 0.3); }
+        body.dark-mode .risk-green { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.3); }
+
         .alias { color: #94a3b8; font-size: 12px; margin-top: 6px; }
         
-        /* 收藏按钮 */
         .fav-btn { position: absolute; right: 16px; top: 16px; padding: 8px; z-index: 5; color: #cbd5e1; transition: 0.2s; }
         .fav-btn.active { color: var(--warning); transform: scale(1.1); }
         
-        /* 详情展开区 */
-        .detail { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed #e2e8f0; animation: slideDown 0.3s ease; }
+        .detail { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border); animation: slideDown 0.3s ease; }
         .card.open .detail { display: block; }
         .card.open .chevron { transform: rotate(180deg); }
         .chevron { transition: 0.3s; color: #94a3b8; position: absolute; right: 16px; bottom: 16px; }
         
         .box { padding: 12px 14px; border-radius: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.6; }
         .box-harm { background: #fff1f2; border-left: 4px solid var(--danger); color: #881337; }
-        .box-policy { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; font-size: 13px; }
+        .box-policy { background: var(--bg); color: var(--text-sub); border: 1px solid var(--border); font-size: 13px; }
         .box-alt { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
         
+        body.dark-mode .box-harm { background: rgba(220, 38, 38, 0.15); color: #fda4af; }
+        body.dark-mode .box-alt { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #6ee7b7; }
+
         .label { font-weight: 800; display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; opacity: 0.7; letter-spacing: 0.5px; }
 
+        .share-btn { width: 100%; margin-top: 8px; background: var(--bg); border: 1px solid var(--border); color: var(--primary); padding: 10px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .share-btn:active { background: #e2e8f0; }
+
+        .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 150; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+        .fab-main { width: 56px; height: 56px; border-radius: 50%; background: var(--danger); color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4); cursor: pointer; transition: 0.3s; animation: pulse 2s infinite; border: none; }
+        .fab-menu { display: none; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+        .fab-menu.show { display: flex; }
+        .fab-item { background: white; color: var(--text-main); padding: 8px 16px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 13px; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 6px; transform: scale(0); transition: 0.2s; transform-origin: right bottom; }
+        .fab-menu.show .fab-item { transform: scale(1); }
+        
         footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 30px; }
 
-        /* 模拟扫描遮罩 */
+        /* 指南弹窗 */
+        #guide-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 300; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); opacity: 0; transition: opacity 0.3s; }
+        #guide-modal.show { display: flex; opacity: 1; }
+        .modal-content { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 24px; padding: 24px; position: relative; transform: scale(0.9); transition: transform 0.3s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-height: 85vh; overflow-y: auto; }
+        #guide-modal.show .modal-content { transform: scale(1); }
+        .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg); border: none; width: 30px; height: 30px; border-radius: 50%; color: var(--text-sub); font-size: 20px; cursor: pointer; }
+        .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+        .modal-icon { font-size: 32px; background: var(--bg); padding: 10px; border-radius: 12px; }
+        .modal-title { font-size: 20px; font-weight: 800; }
+        
+        .rec-section { margin-bottom: 16px; }
+        .rec-title { font-size: 12px; font-weight: 800; color: var(--text-sub); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .rec-box { padding: 12px; border-radius: 10px; font-size: 14px; line-height: 1.5; display: flex; gap: 10px; align-items: flex-start; }
+        .rec-good { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+        .rec-bad { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .rec-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+        body.dark-mode .rec-good { background: rgba(22, 101, 52, 0.2); border-color: rgba(22, 101, 52, 0.3); color: #86efac; }
+        body.dark-mode .rec-bad { background: rgba(153, 27, 27, 0.2); border-color: rgba(153, 27, 27, 0.3); color: #fca5a5; }
+        body.dark-mode .rec-info { background: rgba(30, 64, 175, 0.2); border-color: rgba(30, 64, 175, 0.3); color: #93c5fd; }
+
         #scan-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; backdrop-filter: blur(5px); }
         .scan-frame { width: 250px; height: 250px; border: 2px solid rgba(255,255,255,0.3); border-radius: 20px; position: relative; overflow: hidden; margin-bottom: 20px; }
         .scan-line { width: 100%; height: 2px; background: #3b82f6; box-shadow: 0 0 20px #3b82f6; animation: scanning 2s infinite; position: absolute; top: 0; }
         @keyframes scanning { 0% { top: 0; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
 
     </style>
 </head>
@@ -102,10 +182,23 @@
             </div>
             <div>
                 <div style="font-weight:800; font-size:18px; letter-spacing:-0.5px;">家庭用药避坑指南</div>
-                <div style="font-size:11px; opacity:0.8; font-weight:500;">救援版 Ultimate · 49种高危药库</div>
+                <div style="font-size:11px; opacity:0.8; font-weight:500;">救援版 Ultimate</div>
             </div>
         </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="toggleDarkMode()" title="夜间模式">
+                <svg id="moonIcon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
     </header>
+
+    <!-- [新增] 症状对策指南区 (横向滚动) -->
+    <div class="guide-section">
+        <h4 style="margin: 0 0 10px 0; color: white; font-size: 14px; opacity: 0.9;">📋 症状对策 / 快速查阅</h4>
+        <div class="guide-scroll" id="guideContainer">
+            <!-- JS 生成卡片 -->
+        </div>
+    </div>
 
     <div class="search-section">
         <div class="search-container">
@@ -129,10 +222,42 @@
         <!-- JS生成列表 -->
     </div>
 
+    <!-- SOS 浮动按钮组 -->
+    <div class="fab-container">
+        <div class="fab-menu" id="fabMenu">
+            <a href="tel:120" class="fab-item" style="color:#dc2626;">
+                🚑 拨打 120 急救
+            </a>
+            <a href="https://www.google.com/maps/search/医院" target="_blank" class="fab-item">
+                🏥 附近的医院
+            </a>
+        </div>
+        <button class="fab-main" onclick="toggleFab()">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M12 12v3m0-6h.01"></path></svg>
+        </button>
+    </div>
+
     <footer>
         <p>⚠️ 本工具仅供参考，不构成医疗建议</p>
         <p>数据来源：国家药监局(NMPA)公告 / 临床用药须知</p>
     </footer>
+
+    <!-- 指南弹窗 -->
+    <div id="guide-modal" onclick="closeGuide()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeGuide()">×</button>
+            <div class="modal-header">
+                <div class="modal-icon" id="m-icon">💊</div>
+                <div>
+                    <div class="modal-title" id="m-title">标题</div>
+                    <div style="font-size:12px; color:var(--text-sub);" id="m-sub">副标题</div>
+                </div>
+            </div>
+            <div id="m-body">
+                <!-- 内容 -->
+            </div>
+        </div>
+    </div>
 
     <!-- 模拟扫描遮罩 -->
     <div id="scan-overlay">
@@ -202,16 +327,140 @@
             { id: 49, name: "开封过的眼药水", abbr: "Opened Drops", aliases: ["眼药水"], category: "其他", riskLevel: "❌ 4周后丢弃", riskColor: "risk-red", harm: "【细菌感染】眼药水开封4周后防腐剂失效，变成细菌培养皿，滴入引发角膜炎。", consequence: "瓶身有效期仅指未开封。", alternatives: "一次性独立包装" }
         ];
 
+        // --- 指南数据 (已新增流清鼻涕、鼻塞、咽痛、腹泻) ---
+        const guideData = [
+            {
+                icon: "🤒",
+                title: "发热处理",
+                subtitle: "38.5℃分界线",
+                bg: "#ff9a9e",
+                content: {
+                    good: "✅ <b>首选药物：</b><br>1. 对乙酰氨基酚 (泰诺林)<br>2. 布洛芬 (美林)<br><small>*只选一种，间隔4-6小时。</small>",
+                    bad: "❌ <b>千万别做：</b><br>1. 捂汗 (导致热惊厥)<br>2. 酒精擦身 (中毒风险)<br>3. 两种退烧药混吃",
+                    info: "💡 <b>就医信号：</b><br>精神状态差、持续高烧不退、出现皮疹或呼吸困难。"
+                }
+            },
+            {
+                icon: "💧",
+                title: "流清鼻涕",
+                subtitle: "感冒初/过敏",
+                bg: "#a1c4fd",
+                content: {
+                    good: "✅ <b>推荐方案：</b><br>1. 生理盐水洗鼻 (最安全)<br>2. 扑尔敏/氯雷他定 (抗过敏药可止涕)<br>3. 多喝温水",
+                    bad: "❌ <b>避坑：</b><br>1. 别吃抗生素 (清鼻涕多为病毒或过敏)<br>2. 别用纸巾用力擤 (防中耳炎)",
+                    info: "💡 <b>区分：</b><br>清鼻涕通常是感冒初期或过敏；黄脓鼻涕可能是细菌感染或感冒后期。"
+                }
+            },
+            {
+                icon: "👃",
+                title: "严重鼻塞",
+                subtitle: "通气/睡不着",
+                bg: "#f6d365",
+                content: {
+                    good: "✅ <b>缓解方法：</b><br>1. 高渗海盐水喷雾<br>2. 赛洛唑啉/氧甲唑啉喷雾 (仅限短期)<br>3. 热蒸汽熏鼻",
+                    bad: "❌ <b>禁忌：</b><br>血管收缩剂 (滴鼻净/氧甲唑啉) 连续使用<b>不可超过7天</b>，否则会致药物性鼻炎！",
+                    info: "💡 <b>睡觉技巧：</b><br>垫高枕头可以缓解鼻塞带来的睡眠不适。"
+                }
+            },
+            {
+                icon: "🔥",
+                title: "喉咙痛",
+                subtitle: "吞咽痛/红肿",
+                bg: "#ffdde1",
+                content: {
+                    good: "✅ <b>舒缓手段：</b><br>1. 淡盐水漱口 (杀菌消肿)<br>2. 润喉糖 (缓解不适)<br>3. 吃凉流食 (如冰激凌) 可物理镇痛",
+                    bad: "❌ <b>误区：</b><br>1. 别喝太热的水 (加重炎症)<br>2. 别急着吃头孢 (多数是病毒引起的)",
+                    info: "💡 <b>观察：</b><br>如果剧烈疼痛且吞咽困难，或伴有高烧不退，可能是化脓性扁桃体炎，需就医。"
+                }
+            },
+            {
+                icon: "🚽",
+                title: "腹泻/拉稀",
+                subtitle: "防脱水第一",
+                bg: "#e0c3fc",
+                content: {
+                    good: "✅ <b>核心治疗：</b><br>1. 口服补液盐III (ORS) <b>最重要！</b><br>2. 蒙脱石散 (物理止泻)<br>3. 益生菌",
+                    bad: "❌ <b>禁忌：</b><br>1. 禁食 (拉肚子更要吃易消化食物)<br>2. 儿童禁用洛哌丁胺 (易致肠梗阻)",
+                    info: "💡 <b>注意：</b><br>如果出现眼窝凹陷、尿量减少、精神萎靡，说明严重脱水，必须马上去医院！"
+                }
+            },
+            {
+                icon: "😮‍💨",
+                title: "干咳无痰",
+                subtitle: "嗓子痒/刺激",
+                bg: "#a18cd1",
+                content: {
+                    good: "✅ <b>推荐药物：</b><br>1. 右美沙芬 (中枢镇咳)<br>2. 蜂蜜 (1岁以上)<br>3. 润喉糖 (缓解刺激)",
+                    bad: "❌ <b>避坑：</b><br>1. 乱用抗生素 (头孢无效)<br>2. 长期吃甘草片 (成瘾)",
+                    info: "💡 <b>注意：</b><br>如果是夜间咳嗽剧烈，可能与过敏或鼻涕倒流有关。"
+                }
+            },
+            {
+                icon: "🤢",
+                title: "湿咳有痰",
+                subtitle: "痰多/咳不出",
+                bg: "#84fab0",
+                content: {
+                    good: "✅ <b>推荐药物 (化痰)：</b><br>1. 氨溴索 (沐舒坦)<br>2. 乙酰半胱氨酸<br>3. 拍背辅助排痰",
+                    bad: "❌ <b>禁忌：</b><br>禁止使用强力止咳药（如右美沙芬），否则痰排不出会堵塞气管引发肺炎！",
+                    info: "💡 <b>原理：</b><br>先把痰化稀，再咳出来。多喝水也是最好的化痰药。"
+                }
+            },
+            {
+                icon: "🦠",
+                title: "细菌感染",
+                subtitle: "黄脓痰/高烧",
+                bg: "#fbc2eb",
+                content: {
+                    good: "✅ <b>需医生处方：</b><br>1. 头孢类 (地尼/克肟)<br>2. 阿莫西林<br>3. 阿奇霉素 (支原体)",
+                    bad: "❌ <b>不要自己买：</b><br>绝大多数感冒是病毒性的，吃抗生素没用，反而破坏免疫力！",
+                    info: "💡 <b>特征：</b><br>通常有黄脓鼻涕、黄痰、嗓子红肿有脓点，验血白细胞高。"
+                }
+            },
+            {
+                icon: "🛡️",
+                title: "病毒感染",
+                subtitle: "流感/普通感冒",
+                bg: "#4facfe",
+                content: {
+                    good: "✅ <b>对症治疗：</b><br>1. 奥司他韦 (仅限流感)<br>2. 生理盐水洗鼻<br>3. 多休息多喝水",
+                    bad: "❌ <b>无特效药：</b><br>普通病毒感冒没有特效药！<br>乱吃抗病毒口服液多为心理安慰。",
+                    info: "💡 <b>自愈周期：</b><br>通常7-10天会自己好。药物只是让你舒服一点，不能缩短病程。"
+                }
+            }
+        ];
+
         // --- 逻辑代码 ---
         let currentCategory = "全部";
         let favorites = JSON.parse(localStorage.getItem('myDrugFavs') || '[]');
         
+        // 夜间模式检测
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-mode');
+        }
+        
         function init() {
-            // 生成标签
+            // 渲染指南卡片
+            const guideContainer = document.getElementById('guideContainer');
+            guideData.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'guide-card';
+                div.innerHTML = `
+                    <div class="guide-bg" style="background:${item.bg}"></div>
+                    <div>
+                        <div class="guide-icon">${item.icon}</div>
+                        <div class="guide-title">${item.title}</div>
+                    </div>
+                    <div class="guide-sub">${item.subtitle}</div>
+                `;
+                div.onclick = () => openGuide(index);
+                guideContainer.appendChild(div);
+            });
+
+            // 渲染标签
             const categories = ["全部", "退烧止痛", "抗生素", "止咳/止吐", "中药注射", "中草药", "抗病毒", "其他"];
             const tagContainer = document.getElementById('categoryTags');
             
-            // 收藏夹标签
             const favBtn = document.createElement('div');
             favBtn.className = 'tag';
             favBtn.innerHTML = `⚠️ 我的警示单 <span id="favCount">(${favorites.length})</span>`;
@@ -229,6 +478,44 @@
             });
 
             renderList();
+        }
+
+        // 打开指南弹窗
+        function openGuide(index) {
+            const data = guideData[index];
+            document.getElementById('m-icon').innerText = data.icon;
+            document.getElementById('m-title').innerText = data.title;
+            document.getElementById('m-sub').innerText = data.subtitle;
+            
+            document.getElementById('m-body').innerHTML = `
+                <div class="rec-section">
+                    <div class="rec-title">👍 正确做法</div>
+                    <div class="rec-box rec-good">
+                        <div style="font-size:18px">✅</div>
+                        <div>${data.content.good}</div>
+                    </div>
+                </div>
+                <div class="rec-section">
+                    <div class="rec-title" style="color:var(--danger)">⚠️ 避坑禁忌</div>
+                    <div class="rec-box rec-bad">
+                        <div style="font-size:18px">❌</div>
+                        <div>${data.content.bad}</div>
+                    </div>
+                </div>
+                <div class="rec-section">
+                    <div class="rec-title" style="color:#1e40af">ℹ️ 医学常识</div>
+                    <div class="rec-box rec-info">
+                        <div style="font-size:18px">🎓</div>
+                        <div>${data.content.info}</div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('guide-modal').classList.add('show');
+        }
+
+        function closeGuide() {
+            document.getElementById('guide-modal').classList.remove('show');
         }
 
         function switchCategory(cat, btnElement) {
@@ -285,12 +572,12 @@
 
             if (filtered.length === 0) {
                 if (currentCategory === 'favorites') {
-                    container.innerHTML = `<div style="text-align:center; padding:60px 20px; color:#94a3b8;">
+                    container.innerHTML = `<div style="text-align:center; padding:60px 20px; color:var(--text-sub);">
                         <div style="font-size:40px; margin-bottom:10px;">📭</div>
                         <b>警示单是空的</b><br><small>浏览时点击右上角星星 ⭐ <br>把家里的药加入这里备查</small>
                     </div>`;
                 } else {
-                    container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8;">未找到相关药物<br><small>尝试输入"退烧"、"消炎"或通用名</small></div>`;
+                    container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-sub);">未找到相关药物<br><small>尝试输入"退烧"、"消炎"或通用名</small></div>`;
                 }
                 return;
             }
@@ -300,7 +587,7 @@
                 const div = document.createElement('div');
                 div.className = `card`;
                 div.onclick = (e) => {
-                    if(!e.target.closest('.fav-btn')) {
+                    if(!e.target.closest('.fav-btn') && !e.target.closest('.share-btn')) {
                         div.classList.toggle('open');
                     }
                 };
@@ -337,21 +624,56 @@
                         <div class="box box-alt">
                             <span class="label" style="color:#166534">🛡️ 安全替代</span>
                             ${drug.alternatives}
-                        </div>` : ''}
+                        </div>
+                        <button class="share-btn" onclick="shareDrug(event, '${drug.name}', '${drug.riskLevel}', '${drug.harm}')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                            复制警示文案 (发家族群)
+                        </button>
+                        ` : ''}
                     </div>
                 `;
                 container.appendChild(div);
             });
         }
 
-        // 模拟扫描功能
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        function shareDrug(e, name, risk, harm) {
+            e.stopPropagation();
+            const text = `【家庭用药警示】\n💊 药名：${name}\n⚠️ 风险等级：${risk}\n🚨 危害：${harm}\n\n为了家人健康，请检查药箱！数据来源：国家药监局公告。`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = e.target.closest('.share-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `✅ 已复制，去粘贴`;
+                btn.style.background = "var(--success)";
+                btn.style.color = "white";
+                btn.style.borderColor = "var(--success)";
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = "var(--bg)";
+                    btn.style.color = "var(--primary)";
+                    btn.style.borderColor = "var(--border)";
+                }, 2000);
+            }).catch(err => {
+                alert('复制失败，请手动截图。');
+            });
+        }
+
+        function toggleFab() {
+            const menu = document.getElementById('fabMenu');
+            menu.classList.toggle('show');
+        }
+
         function startScan() {
             const overlay = document.getElementById('scan-overlay');
             overlay.style.display = 'flex';
             
             setTimeout(() => {
                 overlay.style.display = 'none';
-                // 随机挑选一个高危药展示 (倾向于新加的药)
                 const randomPool = [1, 2, 40, 42, 43, 46, 49]; 
                 const randomId = randomPool[Math.floor(Math.random() * randomPool.length)];
                 const drug = drugDatabase.find(d => d.id === randomId);
@@ -372,7 +694,12 @@
         }
 
         init();
+        
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.fab-container')) {
+                document.getElementById('fabMenu').classList.remove('show');
+            }
+        });
     </script>
 </body>
 </html>
-
