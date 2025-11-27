@@ -45,13 +45,12 @@
         .icon-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
         .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
 
-        /* === 指南卡片区 (带箭头) === */
-        .guide-section { margin: -25px 0 10px 0; padding: 0 16px; position: relative; z-index: 101; }
+        /* 指南卡片区 */
+        .guide-section { margin: -25px 0 10px 0; padding: 0 16px; position: relative; z-index: 101; transition: all 0.3s; }
+        .guide-section.hidden { display: none; }
         
-        /* 箭头容器 */
         .guide-wrapper { position: relative; }
         
-        /* 左右箭头样式 */
         .nav-arrow {
             position: absolute; top: 50%; transform: translateY(-50%);
             width: 32px; height: 32px; border-radius: 50%;
@@ -61,36 +60,24 @@
             color: var(--primary);
             display: flex; align-items: center; justify-content: center;
             z-index: 105; cursor: pointer; transition: all 0.3s;
-            opacity: 0; pointer-events: none; /* 默认隐藏 */
+            opacity: 0; pointer-events: none;
         }
-        /* 显示状态 */
         .nav-arrow.visible { opacity: 1; pointer-events: auto; }
         .nav-arrow:active { transform: translateY(-50%) scale(0.9); background: #f1f5f9; }
-        
         .nav-arrow.left { left: -8px; }
         .nav-arrow.right { right: -8px; }
-        
         body.dark-mode .nav-arrow { background: #334155; color: white; border-color: #475569; }
 
         .guide-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 10px 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
         .guide-scroll::-webkit-scrollbar { display: none; }
         
         .guide-card {
-            flex: 0 0 auto;
-            width: 110px;
-            height: 105px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 12px;
+            flex: 0 0 auto; width: 110px; height: 105px;
+            background: var(--card-bg); border-radius: 16px; padding: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: transform 0.2s;
-            border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between;
+            cursor: pointer; transition: transform 0.2s;
+            border: 1px solid var(--border); position: relative; overflow: hidden;
         }
         .guide-card:active { transform: scale(0.95); }
         .guide-icon { font-size: 24px; margin-bottom: 5px; }
@@ -98,17 +85,33 @@
         .guide-sub { font-size: 10px; color: var(--text-sub); opacity: 0.8; margin-top: 2px; }
         .guide-bg { position: absolute; top: -10px; right: -10px; width: 60px; height: 60px; border-radius: 50%; opacity: 0.15; }
 
+        /* 警示横幅样式 */
+        .alert-banner {
+            max-width: 800px; margin: 0 16px 15px 16px;
+            background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px;
+            padding: 10px 16px; color: #991b1b; font-size: 13px; line-height: 1.4;
+            display: flex; align-items: center; box-shadow: 0 2px 6px rgba(220,38,38,0.05);
+        }
+        @media (min-width: 832px) { .alert-banner { margin: 0 auto 15px auto; } }
+        body.dark-mode .alert-banner { background: rgba(127, 29, 29, 0.2); border-color: rgba(127, 29, 29, 0.4); color: #fca5a5; }
+        .pulse-icon { margin-right: 8px; font-size: 16px; animation: pulseText 2s infinite; }
+        @keyframes pulseText { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
         /* 搜索区样式 */
         .search-section { background: var(--card-bg); padding: 20px; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); margin: 0 16px 20px 16px; transition: background 0.3s; }
         @media (min-width: 832px) { .search-section { margin: 0 auto 20px auto; max-width: 800px; } }
 
-        .search-container { position: relative; display: flex; gap: 10px; margin-bottom: 15px; }
+        .search-container { position: relative; display: flex; gap: 10px; margin-bottom: 10px; } /* 底部间距调小给提示语 */
         input { width: 100%; padding: 14px 14px 14px 44px; font-size: 16px; border: 2px solid var(--border); border-radius: 12px; outline: none; transition: all 0.3s; background: var(--input-bg); color: var(--text-main); }
         input:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
         
         .cam-btn { background: var(--primary); color: white; border: none; padding: 0 16px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; min-width: 60px; transition: 0.2s; }
         .cam-btn:active { transform: scale(0.95); background: #3730a3; }
+
+        /* [新增] 缩写搜索提示 */
+        .search-hint { font-size: 12px; color: var(--text-sub); margin-bottom: 15px; display: flex; align-items: center; gap: 6px; background: var(--input-bg); padding: 8px 12px; border-radius: 8px; border: 1px dashed var(--border); }
+        .search-hint b { color: var(--primary); }
 
         /* 标签按钮 */
         .tags { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
@@ -218,26 +221,28 @@
     </header>
 
     <!-- 症状对策指南区 (带左右箭头) -->
-    <div class="guide-section">
+    <div class="guide-section" id="guideSection">
         <h4 style="margin: 0 0 10px 0; color: white; font-size: 14px; opacity: 0.9;">📋 症状对策 / 快速查阅</h4>
         
-        <!-- 箭头包裹层 -->
         <div class="guide-wrapper">
-            <!-- 左箭头 -->
             <button class="nav-arrow left" id="navLeft" onclick="scrollGuide(-1)">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
             </button>
             
-            <!-- 滚动区域 -->
             <div class="guide-scroll" id="guideContainer" onscroll="checkArrows()">
                 <!-- JS 生成卡片 -->
             </div>
             
-            <!-- 右箭头 -->
             <button class="nav-arrow right visible" id="navRight" onclick="scrollGuide(1)">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
             </button>
         </div>
+    </div>
+
+    <!-- 警示横幅 -->
+    <div class="alert-banner">
+        <div class="pulse-icon">🚨</div>
+        <div><b>严查黑名单：</b>本库收录 49 种国家注销、禁用及儿童慎用药物。</div>
     </div>
 
     <div class="search-section">
@@ -246,12 +251,16 @@
                 <span class="search-icon">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </span>
-                <input type="text" id="searchInput" placeholder="搜药名 / 缩写 / 功效..." oninput="renderList()">
+                <input type="text" id="searchInput" placeholder="搜症状 / 药名 / 诊所缩写 (如 APC)..." oninput="searchAll()">
             </div>
             <button class="cam-btn" onclick="startScan()">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 AI识别
             </button>
+        </div>
+        <!-- [新增] 缩写搜索提示 -->
+        <div class="search-hint">
+            <span>🕵️</span> <b>看不懂处方？</b> 试试输入由字母组成的缩写 (如 APC、RBV、DXM)
         </div>
         <div class="tags" id="categoryTags">
             <!-- JS生成标签 -->
@@ -376,7 +385,7 @@
                 bg: "#ff9a9e",
                 content: {
                     good: "✅ <b>首选药物：</b><br>1. 对乙酰氨基酚 (泰诺林)<br>2. 布洛芬 (美林)<br><small>*只选一种，间隔4-6小时。</small>",
-                    bad: "❌ <b>千万别做：</b><br>1. 捂汗 (导致热惊厥)<br>2. 酒精擦身 (中毒风险)<br>3. 两种退烧药混吃",
+                    bad: "❌ <b>千万别做：</b><br>1. 捂汗 (导致热惊厥)<br>2. 酒精擦身 (中毒风险)<br>3. 两种退烧药混吃<br>🚫 <b>绝对禁用：</b>安乃近、尼美舒利、氨基比林、阿司匹林(儿童)、赖氨匹林。",
                     info: "💡 <b>就医信号：</b><br>精神状态差、持续高烧不退、出现皮疹或呼吸困难。"
                 }
             },
@@ -387,7 +396,7 @@
                 bg: "#a1c4fd",
                 content: {
                     good: "✅ <b>推荐方案：</b><br>1. 生理盐水洗鼻 (最安全)<br>2. 扑尔敏/氯雷他定 (抗过敏药可止涕)<br>3. 多喝温水",
-                    bad: "❌ <b>避坑：</b><br>1. 别吃抗生素 (清鼻涕多为病毒或过敏)<br>2. 别用纸巾用力擤 (防中耳炎)",
+                    bad: "❌ <b>避坑：</b><br>1. 别吃抗生素 (清鼻涕多为病毒或过敏)<br>2. 别用纸巾用力擤 (防中耳炎)<br>🚫 <b>禁用：</b>萘甲唑啉(滴鼻净)、艾畅(老版)。",
                     info: "💡 <b>区分：</b><br>清鼻涕通常是感冒初期或过敏；黄脓鼻涕可能是细菌感染或感冒后期。"
                 }
             },
@@ -420,8 +429,19 @@
                 bg: "#e0c3fc",
                 content: {
                     good: "✅ <b>核心治疗：</b><br>1. 口服补液盐III (ORS) <b>最重要！</b><br>2. 蒙脱石散 (物理止泻)<br>3. 益生菌",
-                    bad: "❌ <b>禁忌：</b><br>1. 禁食 (拉肚子更要吃易消化食物)<br>2. 儿童禁用洛哌丁胺 (易致肠梗阻)",
+                    bad: "❌ <b>禁忌：</b><br>1. 禁食 (拉肚子更要吃易消化食物)<br>🚫 <b>禁用：</b>洛哌丁胺(易蒙停-儿童禁用)、诺氟沙星(影响骨骼)。",
                     info: "💡 <b>注意：</b><br>如果出现眼窝凹陷、尿量减少、精神萎靡，说明严重脱水，必须马上去医院！"
+                }
+            },
+            {
+                icon: "😮‍💨",
+                title: "干咳无痰",
+                subtitle: "嗓子痒/刺激",
+                bg: "#a18cd1",
+                content: {
+                    good: "✅ <b>推荐药物：</b><br>1. 右美沙芬 (中枢镇咳)<br>2. 蜂蜜 (1岁以上)<br>3. 润喉糖 (缓解刺激)",
+                    bad: "❌ <b>避坑：</b><br>乱用抗生素 (头孢无效)<br>🚫 <b>禁用：</b>可待因(罂粟壳)、异丙嗪(非那根)、复方甘草片。",
+                    info: "💡 <b>注意：</b><br>如果是夜间咳嗽剧烈，可能与过敏或鼻涕倒流有关。"
                 }
             },
             {
@@ -436,29 +456,16 @@
                 }
             },
             {
-                icon: "😮‍💨",
-                title: "干咳无痰",
-                subtitle: "嗓子痒/刺激",
-                bg: "#a18cd1",
-                content: {
-                    good: "✅ <b>推荐药物：</b><br>1. 右美沙芬 (中枢镇咳)<br>2. 蜂蜜 (1岁以上)<br>3. 润喉糖 (缓解刺激)",
-                    bad: "❌ <b>避坑：</b><br>1. 乱用抗生素 (头孢无效)<br>2. 长期吃甘草片 (成瘾)",
-                    info: "💡 <b>注意：</b><br>如果是夜间咳嗽剧烈，可能与过敏或鼻涕倒流有关。"
-                }
-            },
-            // [新增] 1. 呕吐
-            {
                 icon: "🤮",
                 title: "呕吐护理",
                 subtitle: "止吐/防脱水",
                 bg: "#ffcc80",
                 content: {
                     good: "✅ <b>正确步骤：</b><br>1. 暂停进食1-2小时让胃休息<br>2. 少量多次喝口服补液盐或水<br>3. 侧卧睡姿防呛咳",
-                    bad: "❌ <b>禁忌：</b><br>1. 强迫进食 (会吐更厉害)<br>2. 自行服用止吐药 (很多止吐药儿童禁用，如甲氧氯普胺)",
+                    bad: "❌ <b>禁忌：</b><br>强迫进食 (会吐更厉害)<br>🚫 <b>慎用：</b>甲氧氯普胺(胃复安-儿童易致锥体外系反应)。",
                     info: "💡 <b>警惕：</b><br>若呕吐呈喷射状、伴剧烈头痛或精神极差，可能是脑炎或肠梗阻，速去医院。"
                 }
             },
-            // [新增] 2. 便秘
             {
                 icon: "💩",
                 title: "便秘/拉不出",
@@ -466,11 +473,10 @@
                 bg: "#fff59d",
                 content: {
                     good: "✅ <b>安全用药：</b><br>1. 乳果糖 (最安全，软化大便)<br>2. 开塞露 (仅限临时救急)<br>3. 多吃西梅/火龙果",
-                    bad: "❌ <b>避坑：</b><br>1. 长期喝番泻叶/肠清茶 (会导致结肠黑变病)<br>2. 给孩子用“果导片” (已注销致癌物)",
+                    bad: "❌ <b>避坑：</b><br>长期喝番泻叶/肠清茶<br>🚫 <b>禁用：</b>酚酞片(果导片-致癌已注销)。",
                     info: "💡 <b>警惕：</b><br>超过3天不排便且伴有腹痛、呕吐、不排气，警惕肠梗阻。"
                 }
             },
-            // [新增] 3. 过敏
             {
                 icon: "🌿",
                 title: "皮肤过敏/痒",
@@ -482,7 +488,6 @@
                     info: "💡 <b>致命信号：</b><br>若出现<b>呼吸困难</b>、声音嘶哑或嘴唇肿胀，是喉头水肿 (会窒息)，必须立刻打120！"
                 }
             },
-            // [新增] 4. 烫伤
             {
                 icon: "🍳",
                 title: "烫伤急救",
@@ -512,7 +517,7 @@
                 bg: "#4facfe",
                 content: {
                     good: "✅ <b>对症治疗：</b><br>1. 奥司他韦 (仅限流感)<br>2. 生理盐水洗鼻<br>3. 多休息多喝水",
-                    bad: "❌ <b>无特效药：</b><br>普通病毒感冒没有特效药！<br>乱吃抗病毒口服液多为心理安慰。",
+                    bad: "❌ <b>无特效药：</b><br>普通病毒感冒没有特效药！<br>乱吃抗病毒口服液多为心理安慰<br>🚫 <b>慎用：</b>利巴韦林、阿米卡星。",
                     info: "💡 <b>自愈周期：</b><br>通常7-10天会自己好。药物只是让你舒服一点，不能缩短病程。"
                 }
             }
@@ -528,23 +533,7 @@
         }
         
         function init() {
-            // 渲染指南卡片
-            const guideContainer = document.getElementById('guideContainer');
-            guideData.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'guide-card';
-                div.innerHTML = `
-                    <div class="guide-bg" style="background:${item.bg}"></div>
-                    <div>
-                        <div class="guide-icon">${item.icon}</div>
-                        <div class="guide-title">${item.title}</div>
-                    </div>
-                    <div class="guide-sub">${item.subtitle}</div>
-                `;
-                div.onclick = () => openGuide(index);
-                guideContainer.appendChild(div);
-            });
-            // 初始化检查箭头状态
+            renderGuides(""); // 初始渲染所有指南
             setTimeout(checkArrows, 100);
 
             // 渲染标签
@@ -570,32 +559,76 @@
             renderList();
         }
 
+        // [核心] 双向搜索功能
+        function searchAll() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            renderList(searchTerm);
+            renderGuides(searchTerm);
+        }
+
+        // 渲染指南卡片 (支持搜索过滤)
+        function renderGuides(searchTerm) {
+            const container = document.getElementById('guideContainer');
+            container.innerHTML = '';
+
+            // 过滤逻辑：搜索 标题、副标题 或 内容
+            const filtered = guideData.filter(item => {
+                if (!searchTerm) return true;
+                const str = (item.title + item.subtitle + JSON.stringify(item.content)).toLowerCase();
+                return str.includes(searchTerm);
+            });
+
+            // 渲染过滤后的卡片
+            filtered.forEach((item) => {
+                // 必须找到原始 index 才能正确打开弹窗
+                const originalIndex = guideData.indexOf(item);
+                
+                const div = document.createElement('div');
+                div.className = 'guide-card';
+                div.innerHTML = `
+                    <div class="guide-bg" style="background:${item.bg}"></div>
+                    <div>
+                        <div class="guide-icon">${item.icon}</div>
+                        <div class="guide-title">${item.title}</div>
+                    </div>
+                    <div class="guide-sub">${item.subtitle}</div>
+                `;
+                div.onclick = () => openGuide(originalIndex);
+                container.appendChild(div);
+            });
+
+            // 检查是否显示区域 (无结果时隐藏)
+            const section = document.getElementById('guideSection');
+            if (filtered.length === 0 && searchTerm !== "") {
+                section.classList.add('hidden');
+            } else {
+                section.classList.remove('hidden');
+            }
+
+            // 更新箭头状态
+            setTimeout(checkArrows, 100);
+        }
+
         // 滚动箭头逻辑
         function scrollGuide(direction) {
             const container = document.getElementById('guideContainer');
-            const scrollAmount = 200; // 每次滚动距离
-            container.scrollBy({
-                left: direction * scrollAmount,
-                behavior: 'smooth'
-            });
-            setTimeout(checkArrows, 300); // 滚动后检查箭头
+            const scrollAmount = 200; 
+            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+            setTimeout(checkArrows, 300);
         }
 
         function checkArrows() {
             const container = document.getElementById('guideContainer');
             const leftArrow = document.getElementById('navLeft');
             const rightArrow = document.getElementById('navRight');
-            
             const tolerance = 2; 
 
-            // 检查左边
             if (container.scrollLeft > tolerance) {
                 leftArrow.classList.add('visible');
             } else {
                 leftArrow.classList.remove('visible');
             }
 
-            // 检查右边
             if (container.scrollWidth - container.clientWidth - container.scrollLeft > tolerance) {
                 rightArrow.classList.add('visible');
             } else {
@@ -675,8 +708,12 @@
             }
         }
 
-        function renderList() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        function renderList(searchTerm = "") {
+            // 如果没有传参，则获取输入框的值
+            if (searchTerm === "") {
+                searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            }
+            
             const container = document.getElementById('drugList');
             container.innerHTML = '';
 
@@ -806,7 +843,8 @@
                 document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
                 document.querySelectorAll('.tag')[1].classList.add('active'); 
                 
-                renderList();
+                // 这里调用 searchAll 触发双向搜索
+                searchAll();
                 
                 setTimeout(() => {
                     const firstCard = document.querySelector('.card');
