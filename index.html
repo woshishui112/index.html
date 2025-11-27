@@ -45,9 +45,34 @@
         .icon-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
         .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
 
-        /* 指南卡片区 (横向滚动) */
+        /* === 指南卡片区 (带箭头) === */
         .guide-section { margin: -25px 0 10px 0; padding: 0 16px; position: relative; z-index: 101; }
-        .guide-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        
+        /* 箭头容器 */
+        .guide-wrapper { position: relative; }
+        
+        /* 左右箭头样式 */
+        .nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 105; cursor: pointer; transition: all 0.3s;
+            opacity: 0; pointer-events: none; /* 默认隐藏 */
+        }
+        /* 显示状态 */
+        .nav-arrow.visible { opacity: 1; pointer-events: auto; }
+        .nav-arrow:active { transform: translateY(-50%) scale(0.9); background: #f1f5f9; }
+        
+        .nav-arrow.left { left: -8px; }
+        .nav-arrow.right { right: -8px; }
+        
+        body.dark-mode .nav-arrow { background: #334155; color: white; border-color: #475569; }
+
+        .guide-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 10px 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
         .guide-scroll::-webkit-scrollbar { display: none; }
         
         .guide-card {
@@ -192,11 +217,26 @@
         </div>
     </header>
 
-    <!-- [新增] 症状对策指南区 (横向滚动) -->
+    <!-- 症状对策指南区 (带左右箭头) -->
     <div class="guide-section">
         <h4 style="margin: 0 0 10px 0; color: white; font-size: 14px; opacity: 0.9;">📋 症状对策 / 快速查阅</h4>
-        <div class="guide-scroll" id="guideContainer">
-            <!-- JS 生成卡片 -->
+        
+        <!-- 箭头包裹层 -->
+        <div class="guide-wrapper">
+            <!-- 左箭头 -->
+            <button class="nav-arrow left" id="navLeft" onclick="scrollGuide(-1)">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            
+            <!-- 滚动区域 -->
+            <div class="guide-scroll" id="guideContainer" onscroll="checkArrows()">
+                <!-- JS 生成卡片 -->
+            </div>
+            
+            <!-- 右箭头 -->
+            <button class="nav-arrow right visible" id="navRight" onclick="scrollGuide(1)">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+            </button>
         </div>
     </div>
 
@@ -327,7 +367,7 @@
             { id: 49, name: "开封过的眼药水", abbr: "Opened Drops", aliases: ["眼药水"], category: "其他", riskLevel: "❌ 4周后丢弃", riskColor: "risk-red", harm: "【细菌感染】眼药水开封4周后防腐剂失效，变成细菌培养皿，滴入引发角膜炎。", consequence: "瓶身有效期仅指未开封。", alternatives: "一次性独立包装" }
         ];
 
-        // --- 指南数据 (已新增流清鼻涕、鼻塞、咽痛、腹泻) ---
+        // --- 指南数据 ---
         const guideData = [
             {
                 icon: "🤒",
@@ -385,6 +425,17 @@
                 }
             },
             {
+                icon: "🤢",
+                title: "湿咳有痰",
+                subtitle: "痰多/咳不出",
+                bg: "#84fab0",
+                content: {
+                    good: "✅ <b>推荐药物 (化痰)：</b><br>1. 氨溴索 (沐舒坦)<br>2. 乙酰半胱氨酸<br>3. 拍背辅助排痰",
+                    bad: "❌ <b>禁忌：</b><br>禁止使用强力止咳药（如右美沙芬），否则痰排不出会堵塞气管引发肺炎！",
+                    info: "💡 <b>原理：</b><br>先把痰化稀，再咳出来。多喝水也是最好的化痰药。"
+                }
+            },
+            {
                 icon: "😮‍💨",
                 title: "干咳无痰",
                 subtitle: "嗓子痒/刺激",
@@ -395,15 +446,52 @@
                     info: "💡 <b>注意：</b><br>如果是夜间咳嗽剧烈，可能与过敏或鼻涕倒流有关。"
                 }
             },
+            // [新增] 1. 呕吐
             {
-                icon: "🤢",
-                title: "湿咳有痰",
-                subtitle: "痰多/咳不出",
-                bg: "#84fab0",
+                icon: "🤮",
+                title: "呕吐护理",
+                subtitle: "止吐/防脱水",
+                bg: "#ffcc80",
                 content: {
-                    good: "✅ <b>推荐药物 (化痰)：</b><br>1. 氨溴索 (沐舒坦)<br>2. 乙酰半胱氨酸<br>3. 拍背辅助排痰",
-                    bad: "❌ <b>禁忌：</b><br>禁止使用强力止咳药（如右美沙芬），否则痰排不出会堵塞气管引发肺炎！",
-                    info: "💡 <b>原理：</b><br>先把痰化稀，再咳出来。多喝水也是最好的化痰药。"
+                    good: "✅ <b>正确步骤：</b><br>1. 暂停进食1-2小时让胃休息<br>2. 少量多次喝口服补液盐或水<br>3. 侧卧睡姿防呛咳",
+                    bad: "❌ <b>禁忌：</b><br>1. 强迫进食 (会吐更厉害)<br>2. 自行服用止吐药 (很多止吐药儿童禁用，如甲氧氯普胺)",
+                    info: "💡 <b>警惕：</b><br>若呕吐呈喷射状、伴剧烈头痛或精神极差，可能是脑炎或肠梗阻，速去医院。"
+                }
+            },
+            // [新增] 2. 便秘
+            {
+                icon: "💩",
+                title: "便秘/拉不出",
+                subtitle: "肚子胀/硬结",
+                bg: "#fff59d",
+                content: {
+                    good: "✅ <b>安全用药：</b><br>1. 乳果糖 (最安全，软化大便)<br>2. 开塞露 (仅限临时救急)<br>3. 多吃西梅/火龙果",
+                    bad: "❌ <b>避坑：</b><br>1. 长期喝番泻叶/肠清茶 (会导致结肠黑变病)<br>2. 给孩子用“果导片” (已注销致癌物)",
+                    info: "💡 <b>警惕：</b><br>超过3天不排便且伴有腹痛、呕吐、不排气，警惕肠梗阻。"
+                }
+            },
+            // [新增] 3. 过敏
+            {
+                icon: "🌿",
+                title: "皮肤过敏/痒",
+                subtitle: "荨麻疹/湿疹",
+                bg: "#80deea",
+                content: {
+                    good: "✅ <b>止痒方案：</b><br>1. 炉甘石洗剂 (止痒神器)<br>2. 西替利嗪/氯雷他定 (抗过敏滴剂)<br>3. 冷敷 (收缩血管止痒)",
+                    bad: "❌ <b>千万别做：</b><br>1. 用热水烫洗 (越烫越痒)<br>2. 涂抹大蒜/牙膏/花露水 (刺激皮肤)",
+                    info: "💡 <b>致命信号：</b><br>若出现<b>呼吸困难</b>、声音嘶哑或嘴唇肿胀，是喉头水肿 (会窒息)，必须立刻打120！"
+                }
+            },
+            // [新增] 4. 烫伤
+            {
+                icon: "🍳",
+                title: "烫伤急救",
+                subtitle: "冲凉水是关键",
+                bg: "#ef9a9a",
+                content: {
+                    good: "✅ <b>黄金法则：</b><br>1. <b>冲：</b>流动凉水冲20分钟以上 (唯一有效急救)<br>2. <b>盖：</b>保鲜膜或无菌纱布轻盖",
+                    bad: "❌ <b>民间偏方害死人：</b><br><b>严禁涂牙膏/酱油/面粉！</b>会造成感染，医生清创时会痛死！也不要冰块直敷。",
+                    info: "💡 <b>注意：</b><br>烫伤面积大、皮肤呈焦黑色或无痛感 (深三度)，需立即就医。"
                 }
             },
             {
@@ -456,6 +544,8 @@
                 div.onclick = () => openGuide(index);
                 guideContainer.appendChild(div);
             });
+            // 初始化检查箭头状态
+            setTimeout(checkArrows, 100);
 
             // 渲染标签
             const categories = ["全部", "退烧止痛", "抗生素", "止咳/止吐", "中药注射", "中草药", "抗病毒", "其他"];
@@ -478,6 +568,39 @@
             });
 
             renderList();
+        }
+
+        // 滚动箭头逻辑
+        function scrollGuide(direction) {
+            const container = document.getElementById('guideContainer');
+            const scrollAmount = 200; // 每次滚动距离
+            container.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+            setTimeout(checkArrows, 300); // 滚动后检查箭头
+        }
+
+        function checkArrows() {
+            const container = document.getElementById('guideContainer');
+            const leftArrow = document.getElementById('navLeft');
+            const rightArrow = document.getElementById('navRight');
+            
+            const tolerance = 2; 
+
+            // 检查左边
+            if (container.scrollLeft > tolerance) {
+                leftArrow.classList.add('visible');
+            } else {
+                leftArrow.classList.remove('visible');
+            }
+
+            // 检查右边
+            if (container.scrollWidth - container.clientWidth - container.scrollLeft > tolerance) {
+                rightArrow.classList.add('visible');
+            } else {
+                rightArrow.classList.remove('visible');
+            }
         }
 
         // 打开指南弹窗
