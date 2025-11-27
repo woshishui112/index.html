@@ -101,7 +101,7 @@
         .search-section { background: var(--card-bg); padding: 20px; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); margin: 0 16px 20px 16px; transition: background 0.3s; }
         @media (min-width: 832px) { .search-section { margin: 0 auto 20px auto; max-width: 800px; } }
 
-        .search-container { position: relative; display: flex; gap: 10px; margin-bottom: 10px; } /* 底部间距调小给提示语 */
+        .search-container { position: relative; display: flex; gap: 10px; margin-bottom: 10px; }
         input { width: 100%; padding: 14px 14px 14px 44px; font-size: 16px; border: 2px solid var(--border); border-radius: 12px; outline: none; transition: all 0.3s; background: var(--input-bg); color: var(--text-main); }
         input:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
@@ -109,7 +109,6 @@
         .cam-btn { background: var(--primary); color: white; border: none; padding: 0 16px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; min-width: 60px; transition: 0.2s; }
         .cam-btn:active { transform: scale(0.95); background: #3730a3; }
 
-        /* [新增] 缩写搜索提示 */
         .search-hint { font-size: 12px; color: var(--text-sub); margin-bottom: 15px; display: flex; align-items: center; gap: 6px; background: var(--input-bg); padding: 8px 12px; border-radius: 8px; border: 1px dashed var(--border); }
         .search-hint b { color: var(--primary); }
 
@@ -258,7 +257,7 @@
                 AI识别
             </button>
         </div>
-        <!-- [新增] 缩写搜索提示 -->
+        <!-- 缩写搜索提示 -->
         <div class="search-hint">
             <span>🕵️</span> <b>看不懂处方？</b> 试试输入由字母组成的缩写 (如 APC、RBV、DXM)
         </div>
@@ -318,69 +317,70 @@
     </div>
 
     <script>
-        // --- 核心数据库 (共 49 条) ---
+        // --- 核心数据库 (共 49 条 - 已增强别名库) ---
         const drugDatabase = [
             // === 1-29 基础高危药 ===
-            { id: 1, name: "安乃近", abbr: "Analgin", aliases: ["大药片", "退烧针", "诺瓦金"], category: "退烧止痛", riskLevel: "❌ 国家注销 (极高危)", riskColor: "risk-red", harm: "【致死】粒细胞缺乏症（免疫瘫痪）；严重过敏性休克。", consequence: "国家药监局公告：停止生产，注销批文。", alternatives: "布洛芬、对乙酰氨基酚" },
-            { id: 2, name: "尼美舒利", abbr: "Nimesulide", aliases: ["瑞芝清", "退烧颗粒"], category: "退烧止痛", riskLevel: "❌ 12岁以下禁用", riskColor: "risk-red", harm: "【肝衰竭】严重肝毒性，致死率高。", consequence: "国家食药监局通知：禁止用于12岁以下。", alternatives: "布洛芬、对乙酰氨基酚" },
-            { id: 3, name: "阿司匹林", abbr: "Aspirin", aliases: ["巴米尔", "ASA"], category: "退烧止痛", riskLevel: "❌ 16岁以下发烧禁用", riskColor: "risk-red", harm: "【瑞氏综合征】致死性脑病+肝损，死亡率30%。", consequence: "儿童病毒感染发烧禁用。", alternatives: "布洛芬" },
-            { id: 4, name: "氨基比林", abbr: "APC", aliases: ["去痛片", "安痛定"], category: "退烧止痛", riskLevel: "⚠️ 淘汰药", riskColor: "risk-orange", harm: "【血液毒性】粒细胞减少，伤肾。", consequence: "已被更安全药物替代。", alternatives: "布洛芬" },
-            { id: 5, name: "赖氨匹林", abbr: "Lys-Asp", aliases: ["退烧针"], category: "退烧止痛", riskLevel: "❌ 16岁以下慎用", riskColor: "risk-red", harm: "同阿司匹林，注射更容易引起瑞氏综合征。", consequence: "说明书警示。", alternatives: "口服退烧药" },
-            { id: 6, name: "阿米卡星", abbr: "AKC", aliases: ["AMK", "丁胺卡那"], category: "抗生素", riskLevel: "⚠️ 儿童慎用 (高危)", riskColor: "risk-orange", harm: "【耳毒性+肾毒性】听力下降甚至耳聋；损伤肾脏。", consequence: "普通感冒用此药属于过度医疗。", alternatives: "头孢类" },
-            { id: 7, name: "庆大霉素", abbr: "GM", aliases: ["Gentamycin", "针剂"], category: "抗生素", riskLevel: "⚠️ 儿童慎用 (高危)", riskColor: "risk-orange", harm: "【耳毒性】一针致聋风险，不可逆。", consequence: "未成年人应慎用。", alternatives: "头孢类" },
-            { id: 8, name: "诺氟沙星", abbr: "Norfloxacin", aliases: ["氟哌酸", "沙星"], category: "抗生素", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【骨骼损伤】影响软骨发育，长不高，肌腱断裂。", consequence: "说明书禁忌：18岁以下禁用。", alternatives: "蒙脱石散" },
-            { id: 9, name: "左氧氟沙星", abbr: "LVFX", aliases: ["Levofloxacin", "沙星类"], category: "抗生素", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【骨骼损伤】影响软骨发育，长不高。", consequence: "说明书禁忌。", alternatives: "头孢类" },
-            { id: 10, name: "四环素", abbr: "TCY", aliases: ["土霉素", "OTC", "强力霉素"], category: "抗生素", riskLevel: "❌ 8岁禁用", riskColor: "risk-red", harm: "【四环素牙】牙齿永久变黑、发育不良。", consequence: "毁容性副作用。", alternatives: "阿奇霉素" },
-            { id: 11, name: "可待因", abbr: "Codeine", aliases: ["罂粟壳", "强力枇杷露", "复方甘草片(旧)", "克咳"], category: "止咳/止吐", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【成瘾/窒息】含毒品成分，抑制呼吸。", consequence: "国家药监局公告：18岁以下禁用。", alternatives: "右美沙芬" },
-            { id: 12, name: "异丙嗪", abbr: "PMZ", aliases: ["非那根", "Promethazine", "伤风止咳"], category: "止咳/止吐", riskLevel: "❌ 2岁禁用", riskColor: "risk-red", harm: "【呼吸抑制】可能导致幼儿呼吸停止死亡！", consequence: "WHO警示：绝对禁用于2岁以下。", alternatives: "海盐水" },
-            { id: 13, name: "萘甲唑啉", abbr: "Naphazoline", aliases: ["滴鼻净", "滴鼻水"], category: "其他", riskLevel: "❌ 儿童禁用", riskColor: "risk-red", harm: "【中毒】易导致儿童休克、昏迷。", consequence: "临床用药须知警示。", alternatives: "海盐水" },
-            { id: 14, name: "艾畅(老版)", abbr: "Pseudoephedrine", aliases: ["伪麻美芬", "艾畅"], category: "其他", riskLevel: "❌ 国家注销", riskColor: "risk-red", harm: "含伪麻黄碱，婴幼儿风险高。", consequence: "国家药监局注销批文。", alternatives: "海盐水" },
-            { id: 15, name: "金刚烷胺", abbr: "Amantadine", aliases: ["优卡丹", "好娃娃", "快克"], category: "抗病毒", riskLevel: "⚠️ 5岁慎用", riskColor: "risk-orange", harm: "肝肾毒性，对流感无效。", consequence: "国家药监局修订说明书。", alternatives: "单一退烧药" },
-            { id: 16, name: "柴胡注射液", abbr: "Chaihu", aliases: ["退烧针"], category: "中药注射", riskLevel: "❌ 儿童禁用", riskColor: "risk-red", harm: "【过敏性休克】曾导致多起儿童致死。", consequence: "国家药监局公告。", alternatives: "口服布洛芬" },
-            { id: 17, name: "双黄连注射液", abbr: "SHL", aliases: ["双黄连"], category: "中药注射", riskLevel: "❌ 4岁禁用", riskColor: "risk-red", harm: "严重过敏反应，休克。", consequence: "国家药监局公告。", alternatives: "口服中成药" },
-            { id: 18, name: "茵栀黄注射液", abbr: "YZH", aliases: ["退黄针"], category: "中药注射", riskLevel: "❌ 新生儿禁用", riskColor: "risk-red", harm: "【死亡风险】曾致新生儿死亡。", consequence: "国家药监局公告。", alternatives: "蓝光照射" },
-            { id: 19, name: "喜炎平", abbr: "XYP", aliases: ["喜炎平"], category: "中药注射", riskLevel: "⚠️ 慎用", riskColor: "risk-orange", harm: "全身性过敏反应，呼吸困难。", consequence: "不良反应通报。", alternatives: "口服药" },
-            { id: 20, name: "土三七", abbr: "TCM Toxic", aliases: ["菊三七"], category: "中草药", riskLevel: "❌ 剧毒", riskColor: "risk-red", harm: "【肝窦阻塞】导致肝腹水、肝衰竭，无药可治。", consequence: "绝对禁用。", alternatives: "正规三七" },
-            { id: 21, name: "酚酞片", keywords: ["酚酞", "果导片"], category: "其他", riskLevel: "❌ 国家注销", riskColor: "risk-red", harm: "【致癌】严重致癌风险。", consequence: "国家药监局注销。", alternatives: "乳果糖" },
-            { id: 22, name: "洛哌丁胺", abbr: "Loperamide", aliases: ["易蒙停", "止泻灵"], category: "其他", riskLevel: "❌ 2岁禁用", riskColor: "risk-red", harm: "【肠坏死】麻痹肠道，导致毒素堆积中毒。", consequence: "2岁以下禁用。", alternatives: "蒙脱石散" },
-            { id: 23, name: "多潘立酮", abbr: "DOM", aliases: ["吗丁啉"], category: "其他", riskLevel: "⚠️ 12岁慎用", riskColor: "risk-orange", harm: "心脏猝死(QT间期延长)。", consequence: "欧美限制使用。", alternatives: "益生菌" },
-            { id: 24, name: "西布曲明", abbr: "Sibutramine", aliases: ["减肥药"], category: "其他", riskLevel: "❌ 全球禁用", riskColor: "risk-red", harm: "增加心脏病和中风风险。", consequence: "已注销。", alternatives: "运动" },
-            { id: 25, name: "地塞米松", abbr: "DXM", aliases: ["激素", "地塞"], category: "其他", riskLevel: "⚠️ 慎用", riskColor: "risk-orange", harm: "滥用退烧掩盖病情，降低免疫力。", consequence: "单纯感冒不应常规使用。", alternatives: "布洛芬" },
-            { id: 26, name: "利巴韦林", abbr: "RBV", aliases: ["病毒唑", "Ribavirin"], category: "抗病毒", riskLevel: "⚠️ 不推荐", riskColor: "risk-orange", harm: "致畸，溶血性贫血。对普通感冒无效。", consequence: "生殖毒性大。", alternatives: "奥司他韦" },
-            { id: 27, name: "强效激素膏", abbr: "Steroids", aliases: ["氯倍他索", "特美肤"], category: "其他", riskLevel: "⚠️ 儿童慎用", riskColor: "risk-orange", harm: "皮肤萎缩，激素依赖，抑制生长。", consequence: "应选弱效激素。", alternatives: "尤卓尔" },
-            { id: 28, name: "头孢地尼", abbr: "Cefdinir", aliases: ["头孢"], category: "抗生素", riskLevel: "✅ 安全抗生素", riskColor: "risk-green", harm: "对症药物，请遵医嘱服用。", consequence: "三代头孢，针对呼吸道。", alternatives: "无" },
-            { id: 29, name: "阿奇霉素", abbr: "Azithromycin", aliases: ["阿奇"], category: "抗生素", riskLevel: "✅ 支原体特效", riskColor: "risk-green", harm: "注意胃肠反应，吃3停4。", consequence: "支原体首选。", alternatives: "无" },
+            { id: 1, name: "安乃近", abbr: "Analgin", aliases: ["大药片", "退烧针", "诺瓦金", "发烧", "高烧"], category: "退烧止痛", riskLevel: "❌ 国家注销 (极高危)", riskColor: "risk-red", harm: "【致死】粒细胞缺乏症（免疫瘫痪）；严重过敏性休克。", consequence: "国家药监局公告：停止生产，注销批文。", alternatives: "布洛芬、对乙酰氨基酚" },
+            { id: 2, name: "尼美舒利", abbr: "Nimesulide", aliases: ["瑞芝清", "退烧颗粒", "发烧", "小孩发热"], category: "退烧止痛", riskLevel: "❌ 12岁以下禁用", riskColor: "risk-red", harm: "【肝衰竭】严重肝毒性，致死率高。", consequence: "国家食药监局通知：禁止用于12岁以下。", alternatives: "布洛芬、对乙酰氨基酚" },
+            { id: 3, name: "阿司匹林", abbr: "Aspirin", aliases: ["巴米尔", "ASA", "发烧"], category: "退烧止痛", riskLevel: "❌ 16岁以下发烧禁用", riskColor: "risk-red", harm: "【瑞氏综合征】致死性脑病+肝损，死亡率30%。", consequence: "儿童病毒感染发烧禁用。", alternatives: "布洛芬" },
+            { id: 4, name: "氨基比林", abbr: "APC", aliases: ["去痛片", "安痛定", "发烧", "头痛"], category: "退烧止痛", riskLevel: "⚠️ 淘汰药", riskColor: "risk-orange", harm: "【血液毒性】粒细胞减少，伤肾。", consequence: "已被更安全药物替代。", alternatives: "布洛芬" },
+            { id: 5, name: "赖氨匹林", abbr: "Lys-Asp", aliases: ["退烧针", "发烧"], category: "退烧止痛", riskLevel: "❌ 16岁以下慎用", riskColor: "risk-red", harm: "同阿司匹林，注射更容易引起瑞氏综合征。", consequence: "说明书警示。", alternatives: "口服退烧药" },
+            { id: 6, name: "阿米卡星", abbr: "AKC", aliases: ["AMK", "丁胺卡那", "消炎药"], category: "抗生素", riskLevel: "⚠️ 儿童慎用 (高危)", riskColor: "risk-orange", harm: "【耳毒性+肾毒性】听力下降甚至耳聋；损伤肾脏。", consequence: "普通感冒用此药属于过度医疗。", alternatives: "头孢类" },
+            { id: 7, name: "庆大霉素", abbr: "GM", aliases: ["Gentamycin", "针剂", "拉肚子", "消炎"], category: "抗生素", riskLevel: "⚠️ 儿童慎用 (高危)", riskColor: "risk-orange", harm: "【耳毒性】一针致聋风险，不可逆。", consequence: "未成年人应慎用。", alternatives: "头孢类" },
+            { id: 8, name: "诺氟沙星", abbr: "Norfloxacin", aliases: ["氟哌酸", "沙星", "拉肚子", "腹泻"], category: "抗生素", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【骨骼损伤】影响软骨发育，长不高，肌腱断裂。", consequence: "说明书禁忌：18岁以下禁用。", alternatives: "蒙脱石散" },
+            { id: 9, name: "左氧氟沙星", abbr: "LVFX", aliases: ["Levofloxacin", "沙星类", "消炎"], category: "抗生素", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【骨骼损伤】影响软骨发育，长不高。", consequence: "说明书禁忌。", alternatives: "头孢类" },
+            { id: 10, name: "四环素", abbr: "TCY", aliases: ["土霉素", "OTC", "强力霉素", "消炎"], category: "抗生素", riskLevel: "❌ 8岁禁用", riskColor: "risk-red", harm: "【四环素牙】牙齿永久变黑、发育不良。", consequence: "毁容性副作用。", alternatives: "阿奇霉素" },
+            { id: 11, name: "可待因", abbr: "Codeine", aliases: ["罂粟壳", "强力枇杷露", "复方甘草片(旧)", "克咳", "咳嗽"], category: "止咳/止吐", riskLevel: "❌ 18岁禁用", riskColor: "risk-red", harm: "【成瘾/窒息】含毒品成分，抑制呼吸。", consequence: "国家药监局公告：18岁以下禁用。", alternatives: "右美沙芬" },
+            { id: 12, name: "异丙嗪", abbr: "PMZ", aliases: ["非那根", "Promethazine", "伤风止咳", "咳嗽"], category: "止咳/止吐", riskLevel: "❌ 2岁禁用", riskColor: "risk-red", harm: "【呼吸抑制】可能导致幼儿呼吸停止死亡！", consequence: "WHO警示：绝对禁用于2岁以下。", alternatives: "海盐水" },
+            { id: 13, name: "萘甲唑啉", abbr: "Naphazoline", aliases: ["滴鼻净", "滴鼻水", "鼻塞", "流鼻涕"], category: "其他", riskLevel: "❌ 儿童禁用", riskColor: "risk-red", harm: "【中毒】易导致儿童休克、昏迷。", consequence: "临床用药须知警示。", alternatives: "海盐水" },
+            { id: 14, name: "艾畅(老版)", abbr: "Pseudoephedrine", aliases: ["伪麻美芬", "艾畅", "流鼻涕", "鼻塞"], category: "其他", riskLevel: "❌ 国家注销", riskColor: "risk-red", harm: "含伪麻黄碱，婴幼儿风险高。", consequence: "国家药监局注销批文。", alternatives: "海盐水" },
+            { id: 15, name: "金刚烷胺", abbr: "Amantadine", aliases: ["优卡丹", "好娃娃", "快克", "感冒"], category: "抗病毒", riskLevel: "⚠️ 5岁慎用", riskColor: "risk-orange", harm: "肝肾毒性，对流感无效。", consequence: "国家药监局修订说明书。", alternatives: "单一退烧药" },
+            { id: 16, name: "柴胡注射液", abbr: "Chaihu", aliases: ["退烧针", "发烧"], category: "中药注射", riskLevel: "❌ 儿童禁用", riskColor: "risk-red", harm: "【过敏性休克】曾导致多起儿童致死。", consequence: "国家药监局公告。", alternatives: "口服布洛芬" },
+            { id: 17, name: "双黄连注射液", abbr: "SHL", aliases: ["双黄连", "感冒"], category: "中药注射", riskLevel: "❌ 4岁禁用", riskColor: "risk-red", harm: "严重过敏反应，休克。", consequence: "国家药监局公告。", alternatives: "口服中成药" },
+            { id: 18, name: "茵栀黄注射液", abbr: "YZH", aliases: ["退黄针", "黄疸"], category: "中药注射", riskLevel: "❌ 新生儿禁用", riskColor: "risk-red", harm: "【死亡风险】曾致新生儿死亡。", consequence: "国家药监局公告。", alternatives: "蓝光照射" },
+            { id: 19, name: "喜炎平", abbr: "XYP", aliases: ["喜炎平", "感冒", "咳嗽"], category: "中药注射", riskLevel: "⚠️ 慎用", riskColor: "risk-orange", harm: "全身性过敏反应，呼吸困难。", consequence: "不良反应通报。", alternatives: "口服药" },
+            { id: 20, name: "土三七", abbr: "TCM Toxic", aliases: ["菊三七", "跌打损伤"], category: "中草药", riskLevel: "❌ 剧毒", riskColor: "risk-red", harm: "【肝窦阻塞】导致肝腹水、肝衰竭，无药可治。", consequence: "绝对禁用。", alternatives: "正规三七" },
+            { id: 21, name: "酚酞片", keywords: ["酚酞", "果导片"], aliases: ["便秘", "拉不出"], category: "其他", riskLevel: "❌ 国家注销", riskColor: "risk-red", harm: "【致癌】严重致癌风险。", consequence: "国家药监局注销。", alternatives: "乳果糖" },
+            { id: 22, name: "洛哌丁胺", abbr: "Loperamide", aliases: ["易蒙停", "止泻灵", "拉肚子", "腹泻"], category: "其他", riskLevel: "❌ 2岁禁用", riskColor: "risk-red", harm: "【肠坏死】麻痹肠道，导致毒素堆积中毒。", consequence: "2岁以下禁用。", alternatives: "蒙脱石散" },
+            { id: 23, name: "多潘立酮", abbr: "DOM", aliases: ["吗丁啉", "胃胀", "消化不良"], category: "其他", riskLevel: "⚠️ 12岁慎用", riskColor: "risk-orange", harm: "心脏猝死(QT间期延长)。", consequence: "欧美限制使用。", alternatives: "益生菌" },
+            { id: 24, name: "西布曲明", abbr: "Sibutramine", aliases: ["减肥药", "瘦身"], category: "其他", riskLevel: "❌ 全球禁用", riskColor: "risk-red", harm: "增加心脏病和中风风险。", consequence: "已注销。", alternatives: "运动" },
+            { id: 25, name: "地塞米松", abbr: "DXM", aliases: ["激素", "地塞", "退烧"], category: "其他", riskLevel: "⚠️ 慎用", riskColor: "risk-orange", harm: "滥用退烧掩盖病情，降低免疫力。", consequence: "单纯感冒不应常规使用。", alternatives: "布洛芬" },
+            { id: 26, name: "利巴韦林", abbr: "RBV", aliases: ["病毒唑", "Ribavirin", "感冒"], category: "抗病毒", riskLevel: "⚠️ 不推荐", riskColor: "risk-orange", harm: "致畸，溶血性贫血。对普通感冒无效。", consequence: "生殖毒性大。", alternatives: "奥司他韦" },
+            { id: 27, name: "强效激素膏", abbr: "Steroids", aliases: ["氯倍他索", "特美肤", "湿疹", "皮炎"], category: "其他", riskLevel: "⚠️ 儿童慎用", riskColor: "risk-orange", harm: "皮肤萎缩，激素依赖，抑制生长。", consequence: "应选弱效激素。", alternatives: "尤卓尔" },
+            { id: 28, name: "头孢地尼", abbr: "Cefdinir", aliases: ["头孢", "消炎"], category: "抗生素", riskLevel: "✅ 安全抗生素", riskColor: "risk-green", harm: "对症药物，请遵医嘱服用。", consequence: "三代头孢，针对呼吸道。", alternatives: "无" },
+            { id: 29, name: "阿奇霉素", abbr: "Azithromycin", aliases: ["阿奇", "支原体", "咳嗽"], category: "抗生素", riskLevel: "✅ 支原体特效", riskColor: "risk-green", harm: "注意胃肠反应，吃3停4。", consequence: "支原体首选。", alternatives: "无" },
             
             // === 30-39 诊所避坑药 ===
-            { id: 30, name: "甲氧氯普胺", abbr: "Metoclopramide", aliases: ["胃复安", "止吐针"], category: "止咳/止吐", riskLevel: "❌ 儿童慎用", riskColor: "risk-red", harm: "【锥体外系反应】儿童易发生震颤、僵硬、眼球上翻（鬼脸综合征）。", consequence: "儿童及老年人慎用。", alternatives: "昂丹司琼" },
-            { id: 31, name: "林可霉素", abbr: "Lincomycin", aliases: ["洁霉素"], category: "抗生素", riskLevel: "⚠️ 淘汰趋势", riskColor: "risk-orange", harm: "【伪膜性肠炎】严重腹泻，过敏反应多。效果不如新药。", consequence: "老一代抗生素，副作用大。", alternatives: "克林霉素" },
-            { id: 32, name: "炎琥宁/穿琥宁", abbr: "Andrographolide", aliases: ["抗病毒针"], category: "中药注射", riskLevel: "⚠️ 高危过敏", riskColor: "risk-orange", harm: "【过敏性休克】发生率极高，特别是儿童。", consequence: "国家药监局多次通报。", alternatives: "无特效药，自愈为主" },
-            { id: 33, name: "红药水/紫药水", abbr: "Mercury/Violet", aliases: ["红汞", "龙胆紫"], category: "其他", riskLevel: "❌ 淘汰", riskColor: "risk-red", harm: "红药水含汞（水银中毒）；紫药水致癌。", consequence: "已被碘伏完全取代。", alternatives: "碘伏" },
-            { id: 34, name: "复方甘草片", abbr: "Licorice", aliases: ["甘草片"], category: "止咳/止吐", riskLevel: "❌ 易成瘾", riskColor: "risk-red", harm: "【阿片成瘾】含阿片粉（鸦片），长期吃会成瘾。", consequence: "严格管制药物。", alternatives: "右美沙芬" },
-            { id: 35, name: "牛黄解毒片", abbr: "Realgar", aliases: ["解毒片"], category: "中草药", riskLevel: "⚠️ 砷中毒", riskColor: "risk-orange", harm: "含雄黄（砷/砒霜成分），长期服用伤肝肾。", consequence: "不宜长期服用。", alternatives: "多喝水" },
-            { id: 36, name: "藿香正气水", abbr: "Alcohol Mix", aliases: ["正气水"], category: "中草药", riskLevel: "⚠️ 酒精反应", riskColor: "risk-orange", harm: "【双硫仑反应】含酒精！若与头孢类同吃，可能致死。", consequence: "不可与头孢同服。", alternatives: "藿香正气液(无醇)" },
-            { id: 37, name: "阿苯片", abbr: "Compound APC", aliases: ["止痛片"], category: "退烧止痛", riskLevel: "❌ 禁用", riskColor: "risk-red", harm: "含氨基比林+苯巴比妥，双重毒性。", consequence: "已被淘汰。", alternatives: "布洛芬" },
-            { id: 38, name: "头孢曲松+钙", abbr: "Interaction", aliases: ["输液反应"], category: "抗生素", riskLevel: "❌ 致死禁忌", riskColor: "risk-red", harm: "【结晶致死】头孢曲松与含钙液（葡萄糖酸钙）混合产生沉淀，致死。", consequence: "严禁混合输注。", alternatives: "分开使用" },
-            { id: 39, name: "卡马西平", abbr: "CBZ", aliases: ["得理多"], category: "其他", riskLevel: "⚠️ 基因风险", riskColor: "risk-orange", harm: "【剥脱性皮炎】汉族人易发生严重皮肤坏死（SJS），需测基因。", consequence: "使用前建议基因检测。", alternatives: "加巴喷丁" },
+            { id: 30, name: "甲氧氯普胺", abbr: "Metoclopramide", aliases: ["胃复安", "止吐针", "呕吐", "吐"], category: "止咳/止吐", riskLevel: "❌ 儿童慎用", riskColor: "risk-red", harm: "【锥体外系反应】儿童易发生震颤、僵硬、眼球上翻（鬼脸综合征）。", consequence: "儿童及老年人慎用。", alternatives: "昂丹司琼" },
+            { id: 31, name: "林可霉素", abbr: "Lincomycin", aliases: ["洁霉素", "消炎"], category: "抗生素", riskLevel: "⚠️ 淘汰趋势", riskColor: "risk-orange", harm: "【伪膜性肠炎】严重腹泻，过敏反应多。效果不如新药。", consequence: "老一代抗生素，副作用大。", alternatives: "克林霉素" },
+            { id: 32, name: "炎琥宁/穿琥宁", abbr: "Andrographolide", aliases: ["抗病毒针", "感冒"], category: "中药注射", riskLevel: "⚠️ 高危过敏", riskColor: "risk-orange", harm: "【过敏性休克】发生率极高，特别是儿童。", consequence: "国家药监局多次通报。", alternatives: "无特效药，自愈为主" },
+            { id: 33, name: "红药水/紫药水", abbr: "Mercury/Violet", aliases: ["红汞", "龙胆紫", "消毒", "擦伤"], category: "其他", riskLevel: "❌ 淘汰", riskColor: "risk-red", harm: "红药水含汞（水银中毒）；紫药水致癌。", consequence: "已被碘伏完全取代。", alternatives: "碘伏" },
+            { id: 34, name: "复方甘草片", abbr: "Licorice", aliases: ["甘草片", "咳嗽"], category: "止咳/止吐", riskLevel: "❌ 易成瘾", riskColor: "risk-red", harm: "【阿片成瘾】含阿片粉（鸦片），长期吃会成瘾。", consequence: "严格管制药物。", alternatives: "右美沙芬" },
+            { id: 35, name: "牛黄解毒片", abbr: "Realgar", aliases: ["解毒片", "上火"], category: "中草药", riskLevel: "⚠️ 砷中毒", riskColor: "risk-orange", harm: "含雄黄（砷/砒霜成分），长期服用伤肝肾。", consequence: "不宜长期服用。", alternatives: "多喝水" },
+            { id: 36, name: "藿香正气水", abbr: "Alcohol Mix", aliases: ["正气水", "中暑"], category: "中草药", riskLevel: "⚠️ 酒精反应", riskColor: "risk-orange", harm: "【双硫仑反应】含酒精！若与头孢类同吃，可能致死。", consequence: "不可与头孢同服。", alternatives: "藿香正气液(无醇)" },
+            { id: 37, name: "阿苯片", abbr: "Compound APC", aliases: ["止痛片", "头痛"], category: "退烧止痛", riskLevel: "❌ 禁用", riskColor: "risk-red", harm: "含氨基比林+苯巴比妥，双重毒性。", consequence: "已被淘汰。", alternatives: "布洛芬" },
+            { id: 38, name: "头孢曲松+钙", abbr: "Interaction", aliases: ["输液反应", "葡萄糖酸钙"], category: "抗生素", riskLevel: "❌ 致死禁忌", riskColor: "risk-red", harm: "【结晶致死】头孢曲松与含钙液（葡萄糖酸钙）混合产生沉淀，致死。", consequence: "严禁混合输注。", alternatives: "分开使用" },
+            { id: 39, name: "卡马西平", abbr: "CBZ", aliases: ["得理多", "癫痫", "三叉神经痛"], category: "其他", riskLevel: "⚠️ 基因风险", riskColor: "risk-orange", harm: "【剥脱性皮炎】汉族人易发生严重皮肤坏死（SJS），需测基因。", consequence: "使用前建议基因检测。", alternatives: "加巴喷丁" },
 
             // === 40-49 新增：隐蔽风险与儿童安全 ===
-            { id: 40, name: "孟鲁司特钠", abbr: "Montelukast", aliases: ["顺尔宁", "孟鲁"], category: "止咳/止吐", riskLevel: "⚠️ 黑框警告", riskColor: "risk-orange", harm: "【精神副作用】FDA黑框警告：可能导致儿童噩梦、攻击性、抑郁甚至自杀倾向。", consequence: "家长需密切观察孩子情绪变化。", alternatives: "氯雷他定/西替利嗪" },
-            { id: 41, name: "氯霉素", abbr: "Chloramphenicol", aliases: ["眼药水"], category: "抗生素", riskLevel: "❌ 严重骨髓毒性", riskColor: "risk-red", harm: "【灰婴综合征】骨髓抑制，导致再生障碍性贫血（白血病前兆）。", consequence: "现已极少使用，儿童禁用。", alternatives: "红霉素眼膏" },
-            { id: 42, name: "小儿氨酚黄那敏", abbr: "Pediatric Mix", aliases: ["护彤", "小快克", "优卡丹"], category: "其他", riskLevel: "⚠️ 易过量中毒", riskColor: "risk-orange", harm: "【肝损伤】含对乙酰氨基酚。若再吃退烧药，会双倍过量致肝衰竭。", consequence: "不建议用于6岁以下普通感冒。", alternatives: "单一成分退烧药" },
-            { id: 43, name: "赛洛唑啉/氧甲唑啉", abbr: "Xylometazoline", aliases: ["鼻炎水", "通鼻喷雾"], category: "其他", riskLevel: "⚠️ 成瘾", riskColor: "risk-orange", harm: "【药物性鼻炎】连续使用超过7天会导致鼻腔反跳性充血，越喷越堵。", consequence: "严格限制使用天数。", alternatives: "海盐水洗鼻" },
-            { id: 44, name: "西咪替丁", abbr: "Cimetidine", aliases: ["甲氰咪胍", "胃药"], category: "其他", riskLevel: "⚠️ 激素副作用", riskColor: "risk-orange", harm: "【抗雄激素】透过血脑屏障。可能导致小男孩乳房发育，老年人神志不清。", consequence: "已被法莫替丁等替代。", alternatives: "法莫替丁/奥美拉唑" },
-            { id: 45, name: "匹多莫德", abbr: "Pidotimod", aliases: ["增强免疫力"], category: "其他", riskLevel: "⚠️ 3岁以下禁用", riskColor: "risk-orange", harm: "【效果不明】临床疗效证据不足，却被滥用于儿童感冒。", consequence: "国家药监局：3岁以下禁用。", alternatives: "均衡饮食" },
-            { id: 46, name: "维C泡腾片", abbr: "Vitamin C", aliases: ["泡腾片"], category: "其他", riskLevel: "❌ 禁直接吞服", riskColor: "risk-red", harm: "【窒息致死】儿童直接吞服会产生大量气体导致窒息死亡！且钠含量极高。", consequence: "必须溶解后饮用。", alternatives: "普通维C片" },
-            { id: 47, name: "硝苯地平(短效)", abbr: "Nifedipine", aliases: ["心痛定", "急救药"], category: "其他", riskLevel: "❌ 禁舌下含服", riskColor: "risk-red", harm: "【中风风险】舌下含服降压过快，会导致脑供血不足引起中风。", consequence: "高血压急症禁忌。", alternatives: "缓释片(遵医嘱)" },
-            { id: 48, name: "甲硝唑", abbr: "Metronidazole", aliases: ["灭滴灵", "牙痛药"], category: "抗生素", riskLevel: "❌ 禁酒/孕早禁", riskColor: "risk-red", harm: "【双硫仑反应】服药期间饮酒可致死；怀孕前3个月禁用（致畸风险）。", consequence: "服药前后一周禁酒。", alternatives: "（牙痛需就医）" },
-            { id: 49, name: "开封过的眼药水", abbr: "Opened Drops", aliases: ["眼药水"], category: "其他", riskLevel: "❌ 4周后丢弃", riskColor: "risk-red", harm: "【细菌感染】眼药水开封4周后防腐剂失效，变成细菌培养皿，滴入引发角膜炎。", consequence: "瓶身有效期仅指未开封。", alternatives: "一次性独立包装" }
+            { id: 40, name: "孟鲁司特钠", abbr: "Montelukast", aliases: ["顺尔宁", "孟鲁", "咳嗽", "哮喘", "鼻炎"], category: "止咳/止吐", riskLevel: "⚠️ 黑框警告", riskColor: "risk-orange", harm: "【精神副作用】FDA黑框警告：可能导致儿童噩梦、攻击性、抑郁甚至自杀倾向。", consequence: "家长需密切观察孩子情绪变化。", alternatives: "氯雷他定/西替利嗪" },
+            { id: 41, name: "氯霉素", abbr: "Chloramphenicol", aliases: ["眼药水", "红眼病"], category: "抗生素", riskLevel: "❌ 严重骨髓毒性", riskColor: "risk-red", harm: "【灰婴综合征】骨髓抑制，导致再生障碍性贫血（白血病前兆）。", consequence: "现已极少使用，儿童禁用。", alternatives: "红霉素眼膏" },
+            { id: 42, name: "小儿氨酚黄那敏", abbr: "Pediatric Mix", aliases: ["护彤", "小快克", "优卡丹", "感冒"], category: "其他", riskLevel: "⚠️ 易过量中毒", riskColor: "risk-orange", harm: "【肝损伤】含对乙酰氨基酚。若再吃退烧药，会双倍过量致肝衰竭。", consequence: "不建议用于6岁以下普通感冒。", alternatives: "单一成分退烧药" },
+            { id: 43, name: "赛洛唑啉/氧甲唑啉", abbr: "Xylometazoline", aliases: ["鼻炎水", "通鼻喷雾", "鼻塞"], category: "其他", riskLevel: "⚠️ 成瘾", riskColor: "risk-orange", harm: "【药物性鼻炎】连续使用超过7天会导致鼻腔反跳性充血，越喷越堵。", consequence: "严格限制使用天数。", alternatives: "海盐水洗鼻" },
+            { id: 44, name: "西咪替丁", abbr: "Cimetidine", aliases: ["甲氰咪胍", "胃药", "胃痛"], category: "其他", riskLevel: "⚠️ 激素副作用", riskColor: "risk-orange", harm: "【抗雄激素】透过血脑屏障。可能导致小男孩乳房发育，老年人神志不清。", consequence: "已被法莫替丁等替代。", alternatives: "法莫替丁/奥美拉唑" },
+            { id: 45, name: "匹多莫德", abbr: "Pidotimod", aliases: ["增强免疫力", "感冒"], category: "其他", riskLevel: "⚠️ 3岁以下禁用", riskColor: "risk-orange", harm: "【效果不明】临床疗效证据不足，却被滥用于儿童感冒。", consequence: "国家药监局：3岁以下禁用。", alternatives: "均衡饮食" },
+            { id: 46, name: "维C泡腾片", abbr: "Vitamin C", aliases: ["泡腾片", "维生素"], category: "其他", riskLevel: "❌ 禁直接吞服", riskColor: "risk-red", harm: "【窒息致死】儿童直接吞服会产生大量气体导致窒息死亡！且钠含量极高。", consequence: "必须溶解后饮用。", alternatives: "普通维C片" },
+            { id: 47, name: "硝苯地平(短效)", abbr: "Nifedipine", aliases: ["心痛定", "急救药", "高血压"], category: "其他", riskLevel: "❌ 禁舌下含服", riskColor: "risk-red", harm: "【中风风险】舌下含服降压过快，会导致脑供血不足引起中风。", consequence: "高血压急症禁忌。", alternatives: "缓释片(遵医嘱)" },
+            { id: 48, name: "甲硝唑", abbr: "Metronidazole", aliases: ["灭滴灵", "牙痛药", "牙疼"], category: "抗生素", riskLevel: "❌ 禁酒/孕早禁", riskColor: "risk-red", harm: "【双硫仑反应】服药期间饮酒可致死；怀孕前3个月禁用（致畸风险）。", consequence: "服药前后一周禁酒。", alternatives: "（牙痛需就医）" },
+            { id: 49, name: "开封过的眼药水", abbr: "Opened Drops", aliases: ["眼药水", "红眼病"], category: "其他", riskLevel: "❌ 4周后丢弃", riskColor: "risk-red", harm: "【细菌感染】眼药水开封4周后防腐剂失效，变成细菌培养皿，滴入引发角膜炎。", consequence: "瓶身有效期仅指未开封。", alternatives: "一次性独立包装" }
         ];
 
-        // --- 指南数据 ---
+        // --- 指南数据 (已增强关键词) ---
         const guideData = [
             {
                 icon: "🤒",
                 title: "发热处理",
+                keywords: ["发烧", "高烧", "发烫", "热度", "体温升高"],
                 subtitle: "38.5℃分界线",
                 bg: "#ff9a9e",
                 content: {
@@ -392,6 +392,7 @@
             {
                 icon: "💧",
                 title: "流清鼻涕",
+                keywords: ["流鼻涕", "鼻水", "感冒"],
                 subtitle: "感冒初/过敏",
                 bg: "#a1c4fd",
                 content: {
@@ -403,6 +404,7 @@
             {
                 icon: "👃",
                 title: "严重鼻塞",
+                keywords: ["鼻子堵", "不通气"],
                 subtitle: "通气/睡不着",
                 bg: "#f6d365",
                 content: {
@@ -414,6 +416,7 @@
             {
                 icon: "🔥",
                 title: "喉咙痛",
+                keywords: ["嗓子疼", "咽喉痛", "吞咽痛", "扁桃体"],
                 subtitle: "吞咽痛/红肿",
                 bg: "#ffdde1",
                 content: {
@@ -425,6 +428,7 @@
             {
                 icon: "🚽",
                 title: "腹泻/拉稀",
+                keywords: ["拉肚子", "拉稀", "跑肚"],
                 subtitle: "防脱水第一",
                 bg: "#e0c3fc",
                 content: {
@@ -436,6 +440,7 @@
             {
                 icon: "😮‍💨",
                 title: "干咳无痰",
+                keywords: ["咳嗽", "没痰"],
                 subtitle: "嗓子痒/刺激",
                 bg: "#a18cd1",
                 content: {
@@ -447,6 +452,7 @@
             {
                 icon: "🤢",
                 title: "湿咳有痰",
+                keywords: ["有痰", "咳嗽"],
                 subtitle: "痰多/咳不出",
                 bg: "#84fab0",
                 content: {
@@ -458,6 +464,7 @@
             {
                 icon: "🤮",
                 title: "呕吐护理",
+                keywords: ["吐", "恶心"],
                 subtitle: "止吐/防脱水",
                 bg: "#ffcc80",
                 content: {
@@ -469,6 +476,7 @@
             {
                 icon: "💩",
                 title: "便秘/拉不出",
+                keywords: ["拉不出", "大便干", "排便困难"],
                 subtitle: "肚子胀/硬结",
                 bg: "#fff59d",
                 content: {
@@ -480,6 +488,7 @@
             {
                 icon: "🌿",
                 title: "皮肤过敏/痒",
+                keywords: ["痒", "起包", "风团", "湿疹"],
                 subtitle: "荨麻疹/湿疹",
                 bg: "#80deea",
                 content: {
@@ -491,6 +500,7 @@
             {
                 icon: "🍳",
                 title: "烫伤急救",
+                keywords: ["烧伤", "起泡"],
                 subtitle: "冲凉水是关键",
                 bg: "#ef9a9a",
                 content: {
@@ -502,6 +512,7 @@
             {
                 icon: "🦠",
                 title: "细菌感染",
+                keywords: ["发炎", "炎症"],
                 subtitle: "黄脓痰/高烧",
                 bg: "#fbc2eb",
                 content: {
@@ -513,6 +524,7 @@
             {
                 icon: "🛡️",
                 title: "病毒感染",
+                keywords: ["流感"],
                 subtitle: "流感/普通感冒",
                 bg: "#4facfe",
                 content: {
@@ -559,28 +571,27 @@
             renderList();
         }
 
-        // [核心] 双向搜索功能
+        // [核心] 双向搜索功能 (增强版)
         function searchAll() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             renderList(searchTerm);
             renderGuides(searchTerm);
         }
 
-        // 渲染指南卡片 (支持搜索过滤)
+        // [新增] 支持 keyword 搜索的指南渲染
         function renderGuides(searchTerm) {
             const container = document.getElementById('guideContainer');
             container.innerHTML = '';
 
-            // 过滤逻辑：搜索 标题、副标题 或 内容
             const filtered = guideData.filter(item => {
                 if (!searchTerm) return true;
+                // 搜索标题、副标题、内容、以及新增的 keywords 数组
+                const matchesKeyword = item.keywords && item.keywords.some(k => k.includes(searchTerm));
                 const str = (item.title + item.subtitle + JSON.stringify(item.content)).toLowerCase();
-                return str.includes(searchTerm);
+                return str.includes(searchTerm) || matchesKeyword;
             });
 
-            // 渲染过滤后的卡片
             filtered.forEach((item) => {
-                // 必须找到原始 index 才能正确打开弹窗
                 const originalIndex = guideData.indexOf(item);
                 
                 const div = document.createElement('div');
@@ -597,7 +608,6 @@
                 container.appendChild(div);
             });
 
-            // 检查是否显示区域 (无结果时隐藏)
             const section = document.getElementById('guideSection');
             if (filtered.length === 0 && searchTerm !== "") {
                 section.classList.add('hidden');
@@ -605,7 +615,6 @@
                 section.classList.remove('hidden');
             }
 
-            // 更新箭头状态
             setTimeout(checkArrows, 100);
         }
 
@@ -709,7 +718,6 @@
         }
 
         function renderList(searchTerm = "") {
-            // 如果没有传参，则获取输入框的值
             if (searchTerm === "") {
                 searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             }
