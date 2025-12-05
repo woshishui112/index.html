@@ -85,6 +85,17 @@
         .guide-sub { font-size: 10px; color: var(--text-sub); opacity: 0.8; margin-top: 2px; }
         .guide-bg { position: absolute; top: -10px; right: -10px; width: 60px; height: 60px; border-radius: 50%; opacity: 0.15; }
 
+        /* 高亮卡片动画 */
+        @keyframes breathe {
+            0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+            50% { transform: scale(1.02); box-shadow: 0 8px 15px rgba(255, 117, 140, 0.3); border-color: #ff758c; }
+            100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        }
+        .highlight-card {
+            animation: breathe 3s infinite ease-in-out;
+            border: 2px solid #ff758c !important; /* 强制红色边框 */
+        }
+
         /* 警示横幅样式 */
         .alert-banner {
             max-width: 800px; margin: 0 16px 15px 16px;
@@ -106,9 +117,6 @@
         input:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
         
-        .cam-btn { background: var(--primary); color: white; border: none; padding: 0 16px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; min-width: 60px; transition: 0.2s; }
-        .cam-btn:active { transform: scale(0.95); background: #3730a3; }
-
         .search-hint { font-size: 12px; color: var(--text-sub); margin-bottom: 15px; display: flex; align-items: center; gap: 6px; background: var(--input-bg); padding: 8px 12px; border-radius: 8px; border: 1px dashed var(--border); }
         .search-hint b { color: var(--primary); }
 
@@ -191,10 +199,6 @@
         body.dark-mode .rec-bad { background: rgba(153, 27, 27, 0.2); border-color: rgba(153, 27, 27, 0.3); color: #fca5a5; }
         body.dark-mode .rec-info { background: rgba(30, 64, 175, 0.2); border-color: rgba(30, 64, 175, 0.3); color: #93c5fd; }
 
-        #scan-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; backdrop-filter: blur(5px); }
-        .scan-frame { width: 250px; height: 250px; border: 2px solid rgba(255,255,255,0.3); border-radius: 20px; position: relative; overflow: hidden; margin-bottom: 20px; }
-        .scan-line { width: 100%; height: 2px; background: #3b82f6; box-shadow: 0 0 20px #3b82f6; animation: scanning 2s infinite; position: absolute; top: 0; }
-        @keyframes scanning { 0% { top: 0; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
 
@@ -252,10 +256,6 @@
                 </span>
                 <input type="text" id="searchInput" placeholder="搜症状 / 药名 / 诊所缩写 (如 APC)..." oninput="searchAll()">
             </div>
-            <button class="cam-btn" onclick="startScan()">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                AI识别
-            </button>
         </div>
         <!-- 缩写搜索提示 -->
         <div class="search-hint">
@@ -305,15 +305,6 @@
                 <!-- 内容 -->
             </div>
         </div>
-    </div>
-
-    <!-- 模拟扫描遮罩 -->
-    <div id="scan-overlay">
-        <div class="scan-frame">
-            <div class="scan-line"></div>
-        </div>
-        <h3>正在分析药品包装...</h3>
-        <p style="font-size:13px; opacity:0.7; margin-top:10px;">(演示模式：随机识别一个高危药)</p>
     </div>
 
     <script>
@@ -377,6 +368,20 @@
 
         // --- 指南数据 (已增强关键词) ---
         const guideData = [
+            // === 新增：验血指标卡片 (放在第一位最显眼) ===
+            {
+                icon: "🩸",
+                title: "验血单速查",
+                keywords: ["验血", "血常规", "白细胞", "crp", "pct", "细菌", "病毒", "化验"],
+                subtitle: "细菌 vs 病毒",
+                bg: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)", 
+                content: {
+                    // 这里的内容会在 openGuide 函数中被特殊处理
+                    good: "<b>🦠 细菌感染 (可能需抗生素)：</b><br>1. <b>白细胞 (WBC)：</b>通常升高 ↑<br>2. <b>中性粒细胞 (N%)：</b>升高 ↑<br>3. <b>CRP：</b>显著升高 (>10-50)<br>4. <b>PCT：</b>>0.5 (细菌特异性强)",
+                    bad: "<b>🦠 病毒感染 (通常自愈)：</b><br>1. <b>白细胞：</b>正常 或 降低 ↓<br>2. <b>淋巴细胞：</b>升高 ↑<br>3. <b>CRP：</b>正常 或 轻微升高<br>4. <b>PCT：</b><0.1 (基本排除细菌)",
+                    info: "💡 <b>核心判断技巧：</b><br>● <b>CRP</b> 反应快，但受外伤/手术影响。<br>● <b>PCT (降钙素原)</b> 是鉴别细菌感染的“金指标”。<br>● <b>提示：</b>若只有“淋巴细胞高”，多喝水休息即可。"
+                }
+            },
             {
                 icon: "🤒",
                 title: "发热处理",
@@ -591,11 +596,14 @@
                 return str.includes(searchTerm) || matchesKeyword;
             });
 
-            filtered.forEach((item) => {
+            filtered.forEach((item, i) => { 
                 const originalIndex = guideData.indexOf(item);
                 
                 const div = document.createElement('div');
-                div.className = 'guide-card';
+                // 如果是第一个卡片且没在搜索，加上高亮动画
+                const highlightClass = (i === 0 && !searchTerm) ? 'guide-card highlight-card' : 'guide-card';
+                
+                div.className = highlightClass; 
                 div.innerHTML = `
                     <div class="guide-bg" style="background:${item.bg}"></div>
                     <div>
@@ -645,32 +653,46 @@
             }
         }
 
-        // 打开指南弹窗
+        // [修改] 打开指南弹窗：增加验血逻辑判断
         function openGuide(index) {
             const data = guideData[index];
             document.getElementById('m-icon').innerText = data.icon;
             document.getElementById('m-title').innerText = data.title;
             document.getElementById('m-sub').innerText = data.subtitle;
             
+            // 动态设置小标题
+            let goodTitle = "👍 正确做法";
+            let badTitle = "⚠️ 避坑禁忌 (千万别做)";
+            let infoTitle = "ℹ️ 医学常识";
+            let badClass = "rec-bad"; // 默认红色背景
+
+            //如果是验血卡片，修改标题和样式
+            if (data.title === "验血单速查") {
+                goodTitle = "📈 细菌性感染指标";
+                badTitle = "📉 病毒性感染指标";
+                infoTitle = "🎓 医生怎么看 (金标准)";
+                badClass = "rec-info"; // 病毒不是禁忌，用蓝色背景更合适
+            }
+
             document.getElementById('m-body').innerHTML = `
                 <div class="rec-section">
-                    <div class="rec-title">👍 正确做法</div>
+                    <div class="rec-title">${goodTitle}</div>
                     <div class="rec-box rec-good">
-                        <div style="font-size:18px">✅</div>
+                        <div style="font-size:18px">${data.title === "验血单速查" ? '🦠' : '✅'}</div>
                         <div>${data.content.good}</div>
                     </div>
                 </div>
                 <div class="rec-section">
-                    <div class="rec-title" style="color:var(--danger)">⚠️ 避坑禁忌</div>
-                    <div class="rec-box rec-bad">
-                        <div style="font-size:18px">❌</div>
+                    <div class="rec-title" style="color:${data.title === "验血单速查" ? 'var(--primary)' : 'var(--danger)'}">${badTitle}</div>
+                    <div class="rec-box ${badClass}">
+                        <div style="font-size:18px">${data.title === "验血单速查" ? '🦠' : '❌'}</div>
                         <div>${data.content.bad}</div>
                     </div>
                 </div>
                 <div class="rec-section">
-                    <div class="rec-title" style="color:#1e40af">ℹ️ 医学常识</div>
+                    <div class="rec-title" style="color:#1e40af">${infoTitle}</div>
                     <div class="rec-box rec-info">
-                        <div style="font-size:18px">🎓</div>
+                        <div style="font-size:18px">💡</div>
                         <div>${data.content.info}</div>
                     </div>
                 </div>
@@ -834,32 +856,6 @@
         function toggleFab() {
             const menu = document.getElementById('fabMenu');
             menu.classList.toggle('show');
-        }
-
-        function startScan() {
-            const overlay = document.getElementById('scan-overlay');
-            overlay.style.display = 'flex';
-            
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                const randomPool = [1, 2, 40, 42, 43, 46, 49]; 
-                const randomId = randomPool[Math.floor(Math.random() * randomPool.length)];
-                const drug = drugDatabase.find(d => d.id === randomId);
-                
-                document.getElementById('searchInput').value = drug.name;
-                currentCategory = "全部";
-                document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tag')[1].classList.add('active'); 
-                
-                // 这里调用 searchAll 触发双向搜索
-                searchAll();
-                
-                setTimeout(() => {
-                    const firstCard = document.querySelector('.card');
-                    if(firstCard) firstCard.classList.add('open');
-                    alert(`🚨 [AI演示模式] \n\n识别结果：${drug.name}\n检测到高风险！请查看详情。`);
-                }, 100);
-            }, 2000);
         }
 
         init();
